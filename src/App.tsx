@@ -17,6 +17,7 @@ import CreateStore from './pages/CreateStore';
 import Stores from './pages/Stores';
 import UserManagement from './pages/UserManagement';
 import Unauthorized from './pages/Unauthorized';
+import Settings from './pages/Settings';
 import { RootState } from './store';
 import { PERMISSIONS } from './utils/permissions';
 
@@ -46,6 +47,8 @@ function App() {
       <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route index element={staff ? <Navigate to={`/stores/${staff.store}/dashboard`} replace /> : <Stores />} />
         <Route path="stores" element={staff ? <Navigate to={`/stores/${staff.store}/dashboard`} replace /> : <Stores />} />
+        <Route path="stores/:storeId/settings" element={staff ? <Navigate to={`/stores/${staff.store}/settings`} replace /> : <Settings />} />
+
         <Route path="stores/create" element={staff ? <Navigate to={`/stores/${staff.store}/dashboard`} replace /> : <CreateStore />} />
         <Route path="stores/:storeId">
           <Route path="dashboard" element={<Dashboard />} />

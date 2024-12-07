@@ -93,22 +93,20 @@ const Header = () => {
                 <div className="py-1">
                   <button
                     onClick={() => {
-                      /* Handle profile click */
+                      alert("Profile to be implemented");
                     }}
                     className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                   >
                     <User className="h-4 w-4 mr-3" />
                     Profile
                   </button>
-                  {canAccessSettings && storeId && (
-                    <button
-                      onClick={() => navigate(`/stores/${storeId}/settings`)}
-                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                    >
-                      <Settings className="h-4 w-4 mr-3" />
-                      Settings
-                    </button>
-                  )}
+                  <button
+                    onClick={() => alert("Settings to be implemented")}
+                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                  >
+                    <Settings className="h-4 w-4 mr-3" />
+                    Settings
+                  </button>
                   <button
                     onClick={handleLogout}
                     className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"

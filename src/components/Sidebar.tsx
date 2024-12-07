@@ -13,6 +13,7 @@ import {
   ChevronRight,
   ChevronLeft,
   FolderTree,
+  Settings,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../store/slices/authSlice";
@@ -45,6 +46,8 @@ const NavItem = ({ to, icon: Icon, children, permission }: NavItemProps) => {
       return null;
     }
   }
+
+  console.log(permission)
 
   return (
     <Link
@@ -168,9 +171,19 @@ const Sidebar = () => {
                 Users
               </NavItem>
               {!staff && (
-                <NavItem to="/stores" icon={Store}>
-                  Switch Store
-                </NavItem>
+                <>
+                  <NavItem
+                    to={`/stores/${storeId}/settings`}
+                    icon={Settings}
+                    permission={PERMISSIONS.MANAGE_SETTINGS}
+                  >
+                    Settings
+                  </NavItem>
+
+                  <NavItem to="/stores" icon={Store}>
+                    Switch Store
+                  </NavItem>
+                </>
               )}
             </>
           )}
