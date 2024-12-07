@@ -1,18 +1,27 @@
-import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Menu as MenuIcon, Bell, LogOut, Settings, User } from 'lucide-react';
-import { RootState } from '../store';
-import { logout } from '../store/slices/authSlice';
-import NotificationList from './notifications/NotificationList';
-import { useGetNotificationsQuery } from '../store/services/notificationService';
-import { PERMISSIONS, hasPermission } from '../utils/permissions';
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { Menu as MenuIcon, Bell, LogOut, Settings, User } from "lucide-react";
+import { RootState } from "../store";
+import { logout } from "../store/slices/authSlice";
+import NotificationList from "./notifications/NotificationList";
+import { useGetNotificationsQuery } from "../store/services/notificationService";
+import { PERMISSIONS, hasPermission } from "../utils/permissions";
+
+interface Staff {
+  role?: {
+    permissions?: any;
+  };
+  name: String;
+}
 
 const Header = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const user = useSelector((state: RootState) => state.auth.user);
-  const staff = useSelector((state: RootState) => state.auth.staff);
+  const { staff } = useSelector((state: RootState) => state.auth) as {
+    staff: Staff;
+  };
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { storeId } = useParams();
@@ -20,16 +29,18 @@ const Header = () => {
   const { data: notifications = [] } = useGetNotificationsQuery(undefined, {
     skip: !user && !staff,
   });
-  
-  const unreadCount = notifications.filter(n => !n.read).length;
-  const displayName = user?.name || staff?.name || '';
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
+  const displayName = user?.name || staff?.name || "";
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/login');
+    navigate("/login");
   };
 
-  const canAccessSettings = !staff || hasPermission(staff.role.permissions, PERMISSIONS.MANAGE_SETTINGS);
+  const canAccessSettings =
+    !staff ||
+    hasPermission(staff?.role?.permissions, PERMISSIONS.MANAGE_SETTINGS);
 
   return (
     <header className="bg-white shadow">
@@ -55,7 +66,7 @@ const Header = () => {
             </button>
 
             {showNotifications && (
-              <div className="absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+              <div className="absolute right-0 md:left-0 mt-2 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                 <NotificationList onClose={() => setShowNotifications(false)} />
               </div>
             )}
@@ -78,7 +89,7 @@ const Header = () => {
             </button>
 
             {showUserMenu && (
-              <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+              <div className="absolute right-0 md:left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                 <div className="py-1">
                   <button
                     onClick={() => {

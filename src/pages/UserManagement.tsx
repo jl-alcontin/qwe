@@ -149,154 +149,155 @@ const UserManagement = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
-          <Users className="h-6 w-6" />
-          User Management
-        </h1>
-      </div>
-
-      {/* Roles Section */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-medium flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Roles & Permissions
-          </h2>
-          <button
-            onClick={() => {
-              setEditingRole(null);
-              setSelectedPermissions([]);
-              resetRole();
-              setShowRoleModal(true);
-            }}
-            className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Role
-          </button>
+    <>
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
+            <Users className="h-6 w-6" />
+            User Management
+          </h1>
         </div>
 
-        <div className="grid grid-cols-1 gap-4">
-          {roles?.map((role) => (
-            <div key={role._id} className="border rounded-lg p-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-medium">{role.name}</h3>
-                  <p className="text-sm text-gray-500">{role.description}</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {role.permissions.map((permission) => (
-                      <span
-                        key={permission.name}
-                        className="px-2 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800"
-                      >
-                        {permission.name}
-                      </span>
-                    ))}
+        {/* Roles Section */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-medium flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              Roles & Permissions
+            </h2>
+            <button
+              onClick={() => {
+                setEditingRole(null);
+                setSelectedPermissions([]);
+                resetRole();
+                setShowRoleModal(true);
+              }}
+              className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Role
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            {roles?.map((role) => (
+              <div key={role._id} className="border rounded-lg p-4">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-medium">{role.name}</h3>
+                    <p className="text-sm text-gray-500">{role.description}</p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {role.permissions.map((permission) => (
+                        <span
+                          key={permission.name}
+                          className="px-2 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800"
+                        >
+                          {permission.name}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => {
-                      setEditingRole(role);
-                      setSelectedPermissions(
-                        role.permissions.map((p) => p.name)
-                      );
-                      resetRole({
-                        name: role.name,
-                        description: role.description,
-                      });
-                      setShowRoleModal(true);
-                    }}
-                    className="text-indigo-600 hover:text-indigo-900"
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteRole(role._id)}
-                    className="text-red-600 hover:text-red-900"
-                    disabled={role.isDefault}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Staff Section */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-medium flex items-center gap-2">
-            <UserPlus className="h-5 w-5" />
-            Staff Members
-          </h2>
-          <button
-            onClick={() => {
-              setEditingStaff(null);
-              resetStaff();
-              setShowStaffModal(true);
-            }}
-            className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Staff
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4">
-          {staff?.map((member) => (
-            <div key={member._id} className="border rounded-lg p-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-medium">{member.name}</h3>
-                  <p className="text-sm text-gray-500">{member.email}</p>
-                  <div className="mt-2">
-                    <span
-                      className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        member.status === "active"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => {
+                        setEditingRole(role);
+                        setSelectedPermissions(
+                          role.permissions.map((p) => p.name)
+                        );
+                        resetRole({
+                          name: role.name,
+                          description: role.description,
+                        });
+                        setShowRoleModal(true);
+                      }}
+                      className="text-indigo-600 hover:text-indigo-900"
                     >
-                      {member.status}
-                    </span>
-                    <span className="ml-2 px-2 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800">
-                      {member.role.name}
-                    </span>
+                      <Edit2 className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteRole(role._id)}
+                      className="text-red-600 hover:text-red-900"
+                      disabled={role.isDefault}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                   </div>
                 </div>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => {
-                      setEditingStaff(member);
-                      resetStaff({
-                        name: member.name,
-                        email: member.email,
-                        role: member.role._id,
-                      });
-                      setShowStaffModal(true);
-                    }}
-                    className="text-indigo-600 hover:text-indigo-900"
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteStaff(member._id)}
-                    className="text-red-600 hover:text-red-900"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Staff Section */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-medium flex items-center gap-2">
+              <UserPlus className="h-5 w-5" />
+              Staff Members
+            </h2>
+            <button
+              onClick={() => {
+                setEditingStaff(null);
+                resetStaff();
+                setShowStaffModal(true);
+              }}
+              className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Staff
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            {staff?.map((member) => (
+              <div key={member._id} className="border rounded-lg p-4">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-medium">{member.name}</h3>
+                    <p className="text-sm text-gray-500">{member.email}</p>
+                    <div className="mt-2">
+                      <span
+                        className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          member.status === "active"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {member.status}
+                      </span>
+                      <span className="ml-2 px-2 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800">
+                        {member.role.name}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => {
+                        setEditingStaff(member);
+                        resetStaff({
+                          name: member.name,
+                          email: member.email,
+                          role: member.role._id,
+                        });
+                        setShowStaffModal(true);
+                      }}
+                      className="text-indigo-600 hover:text-indigo-900"
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteStaff(member._id)}
+                      className="text-red-600 hover:text-red-900"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
-
       {/* Role Modal */}
       {showRoleModal && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
@@ -429,7 +430,9 @@ const UserManagement = () => {
                   </label>
                   <input
                     type="password"
-                    {...registerStaff("password", { required: !editingStaff })}
+                    {...registerStaff("password", {
+                      required: !editingStaff,
+                    })}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   />
                 </div>
@@ -475,7 +478,7 @@ const UserManagement = () => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -10,8 +10,8 @@ import {
   LogOut,
   Boxes,
   Users,
-  Menu,
-  X,
+  ChevronRight,
+  ChevronLeft,
   FolderTree,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,13 +27,21 @@ interface NavItemProps {
   permission?: string;
 }
 
+interface Staff {
+  role?: {
+    permissions?: any;
+  };
+}
+
 const NavItem = ({ to, icon: Icon, children, permission }: NavItemProps) => {
   const location = useLocation();
   const isActive = location.pathname === to;
-  const { staff } = useSelector((state: RootState) => state.auth);
+  const { staff } = useSelector((state: RootState) => state.auth) as {
+    staff: Staff;
+  };
 
   if (permission && staff) {
-    if (!hasPermission(staff.role.permissions, permission)) {
+    if (!hasPermission(staff?.role?.permissions, permission)) {
       return null;
     }
   }
@@ -57,7 +65,20 @@ const Sidebar = () => {
   const dispatch = useDispatch();
   const { storeId } = useParams();
   const { staff, user } = useSelector((state: RootState) => state.auth);
-  const { isOpen, toggle } = useSidebarStore();
+  const { isOpen, setIsOpen, toggle } = useSidebarStore();
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize(); // Call once to set initial state
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("selectedStoreId");
@@ -72,7 +93,7 @@ const Sidebar = () => {
   }
 
   const sidebarContent = (
-    <div className="flex flex-col flex-grow pt-5 bg-indigo-700 overflow-y-auto">
+    <div className="flex flex-col flex-grow pt-5 bg-indigo-700 overflow-y-auto h-full">
       <div className="flex items-center justify-between px-4">
         <div className="flex items-center flex-shrink-0">
           <Store className="h-8 w-8 text-white" />
@@ -80,20 +101,21 @@ const Sidebar = () => {
             POS System
           </span>
         </div>
-        <button
-          onClick={toggle}
-          className="md:hidden p-2 rounded-md text-indigo-100 hover:bg-indigo-800"
-        >
-          <X className="h-6 w-6" />
-        </button>
       </div>
       <div className="mt-5 flex-1 flex flex-col">
         <nav className="flex-1 px-2 pb-4 space-y-1">
           {!storeId ? (
-            !staff && <NavItem to="/stores" icon={Store}>Stores</NavItem>
+            !staff && (
+              <NavItem to="/stores" icon={Store}>
+                Stores
+              </NavItem>
+            )
           ) : (
             <>
-              <NavItem to={`/stores/${storeId}/dashboard`} icon={LayoutDashboard}>
+              <NavItem
+                to={`/stores/${storeId}/dashboard`}
+                icon={LayoutDashboard}
+              >
                 Dashboard
               </NavItem>
               <NavItem
@@ -168,40 +190,29 @@ const Sidebar = () => {
 
   return (
     <>
-      {/* Mobile menu button */}
-      {!isOpen && (
-        <button
-          onClick={toggle}
-          className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
-        >
-          <Menu className="h-6 w-6" />
-        </button>
-      )}
-
-      {/* Mobile sidebar */}
+      {/* Sidebar */}
       <div
-        className={`fixed inset-0 flex z-40 md:hidden transform ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-300 ease-in-out`}
+        className={`fixed inset-y-0 left-0 z-20 w-64 min-w-[10px] bg-indigo-700 overflow-y-auto transition-all duration-300 transform ${
+          isOpen ? "translate-x-0" : "-translate-x-[calc(100%-10px)]"
+        }`}
       >
-        {/* Overlay */}
-        <div
-          className={`fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity ${
-            isOpen ? "opacity-100" : "opacity-0"
-          }`}
-          onClick={toggle}
-        />
-
-        {/* Sidebar */}
-        <div className="relative flex-1 flex flex-col max-w-xs w-full">
-          {sidebarContent}
-        </div>
-      </div>
-
-      {/* Desktop sidebar */}
-      <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
         {sidebarContent}
       </div>
+
+      {/* Toggle button */}
+      <button
+        onClick={toggle}
+        className={`fixed top-1/2 -translate-y-1/2 z-40 w-8 h-8 rounded-full bg-indigo-700 text-white flex items-center justify-center transition-all duration-300 ${
+          isOpen ? "left-60" : "-left-1"
+        } hover:bg-indigo-800`}
+        aria-label={isOpen ? "Close sidebar" : "Open sidebar"}
+      >
+        {isOpen ? (
+          <ChevronLeft className="h-5 w-5" />
+        ) : (
+          <ChevronRight className="h-5 w-5" />
+        )}
+      </button>
     </>
   );
 };
