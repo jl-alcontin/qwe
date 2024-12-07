@@ -14,6 +14,7 @@ import roleRoutes from "../backend/routes/roleRoutes.js";
 import staffRoutes from "../backend/routes/staffRoutes.js";
 import notificationRoutes from "../backend/routes/notificationRoutes.js";
 import userRoutes from "../backend/routes/userRoutes.js";
+import subscriptionRoutes from "../backend/routes/subscriptionRoutes.js";
 import testRoutes from "../backend/routes/testRoute.js";
 
 dotenv.config();
@@ -30,14 +31,10 @@ const connectDB = async () => {
       return;
     }
 
-    await mongoose.connect(
-      process.env.MONGO_URI ||
-        "mongodb+srv://admin:admin@pos-remaster.2f4tp.mongodb.net",
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      }
-    );
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
 
     console.log(`MongoDB Connected: ${mongoose.connection.host}`);
   } catch (error) {
@@ -57,7 +54,7 @@ app.use("/api/roles", roleRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/users", userRoutes);
-
+app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/test", testRoutes);
 
 app.use((err, req, res, next) => {

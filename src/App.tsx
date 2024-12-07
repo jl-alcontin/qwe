@@ -24,9 +24,9 @@ import Stores from "./pages/Stores";
 import UserManagement from "./pages/UserManagement";
 import Unauthorized from "./pages/Unauthorized";
 import Settings from "./pages/Settings";
+import Subscription from "./pages/Subscription";
 import { RootState } from "./store";
 import { PERMISSIONS } from "./utils/permissions";
-
 
 function App() {
   const { token, staff } = useSelector((state: RootState) => state.auth);
@@ -34,7 +34,6 @@ function App() {
   const location = useLocation();
 
   useEffect(() => {
-    // Only redirect if we're at the root path and authenticated
     if (token && location.pathname === "/") {
       if (staff) {
         navigate(`/stores/${staff.store}/dashboard`);
@@ -50,6 +49,7 @@ function App() {
       <Route path="/staff/login" element={<StaffLogin />} />
       <Route path="/register" element={<Register />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
+      <Route path="/subscription" element={<Subscription />} />
 
       <Route
         path="/"

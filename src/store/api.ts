@@ -26,6 +26,8 @@ export const api = createApi({
     "Notifications",
     "User",
     "Inventory",
+    "Subscriptions",
+    "CurrentSubscription"
   ],
   keepUnusedDataFor: 0, // Immediately remove unused data
 });

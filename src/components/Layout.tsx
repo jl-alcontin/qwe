@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import SubscriptionAlert from './SubscriptionAlert';
 import { useSidebarStore } from '../store/ui/sidebarStore';
 
 const Layout = () => {
@@ -12,6 +13,7 @@ const Layout = () => {
       <Sidebar />
       <div className={`flex-1 flex flex-col transition-all duration-300 ${isOpen ? 'ml-64' : 'ml-1'}`}>
         <Header />
+        <SubscriptionAlert />
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
           <Outlet />
         </main>
@@ -21,4 +23,3 @@ const Layout = () => {
 };
 
 export default Layout;
-
