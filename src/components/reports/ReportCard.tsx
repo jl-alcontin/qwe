@@ -20,7 +20,7 @@ const ReportCard = ({ title, value, icon: Icon, description }: ReportCardProps) 
           )}
         </div>
         <div className="p-3 bg-indigo-100 rounded-full">
-          <Icon className="h-6 w-6 text-indigo-600" />
+          <Icon className="h-6 w-6 text-primary" />
         </div>
       </div>
     </div>

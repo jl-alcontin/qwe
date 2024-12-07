@@ -54,8 +54,8 @@ const NavItem = ({ to, icon: Icon, children, permission }: NavItemProps) => {
       to={to}
       className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
         isActive
-          ? "bg-indigo-800 text-white"
-          : "text-indigo-100 hover:bg-indigo-800"
+          ? "bg-secondary text-white"
+          : "text-indigo-100 hover:bg-primary-hover"
       }`}
     >
       <Icon className="mr-3 h-5 w-5" />
@@ -96,7 +96,7 @@ const Sidebar = () => {
   }
 
   const sidebarContent = (
-    <div className="flex flex-col flex-grow pt-5 bg-indigo-700 overflow-y-auto h-full">
+    <div className="flex flex-col flex-grow pt-5 bg-primary overflow-y-auto h-full">
       <div className="flex items-center justify-between px-4">
         <div className="flex items-center flex-shrink-0">
           <Store className="h-8 w-8 text-white" />
@@ -188,7 +188,7 @@ const Sidebar = () => {
         <div className="px-2 pb-4">
           <button
             onClick={handleLogout}
-            className="flex items-center w-full px-4 py-2 text-sm font-medium text-indigo-100 hover:bg-indigo-800 rounded-md"
+            className="flex items-center w-full px-4 py-2 text-sm font-medium text-indigo-100 hover:bg-primary-hover rounded-md"
           >
             <LogOut className="mr-3 h-5 w-5" />
             Logout
@@ -202,7 +202,7 @@ const Sidebar = () => {
     <>
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-20 w-64 min-w-[10px] bg-indigo-700 overflow-y-auto transition-all duration-300 transform ${
+        className={`fixed inset-y-0 left-0 z-20 w-64 min-w-[10px] bg-primary overflow-y-auto transition-all duration-300 transform ${
           isOpen ? "translate-x-0" : "-translate-x-[calc(100%-10px)]"
         }`}
       >
@@ -212,9 +212,9 @@ const Sidebar = () => {
       {/* Toggle button */}
       <button
         onClick={toggle}
-        className={`fixed top-1/2 -translate-y-1/2 z-40 w-8 h-8 rounded-full bg-indigo-700 text-white flex items-center justify-center transition-all duration-300 ${
+        className={`fixed top-1/2 -translate-y-1/2 z-40 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center transition-all duration-300 ${
           isOpen ? "left-60" : "-left-1"
-        } hover:bg-indigo-800`}
+        } hover:bg-primary-hover`}
         aria-label={isOpen ? "Close sidebar" : "Open sidebar"}
       >
         {isOpen ? (

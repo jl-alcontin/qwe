@@ -41,7 +41,7 @@ const Stores = () => {
   if (!user || isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -63,7 +63,7 @@ const Stores = () => {
         </h1>
         <Link
           to="/stores/create"
-          className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+          className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-hover"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Store
@@ -78,7 +78,7 @@ const Stores = () => {
           <div className="mt-6">
             <Link
               to="/stores/create"
-              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-hover"
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Store
@@ -119,7 +119,7 @@ const Stores = () => {
                       e.stopPropagation();
                       navigate(`/stores/${store._id}/categories`);
                     }}
-                    className="text-indigo-600 hover:text-indigo-900"
+                    className="text-primary hover:text-primary-hover"
                   >
                     <Edit2 className="h-4 w-4" />
                   </button>

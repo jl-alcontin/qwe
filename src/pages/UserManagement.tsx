@@ -172,7 +172,7 @@ const UserManagement = () => {
                 resetRole();
                 setShowRoleModal(true);
               }}
-              className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+              className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-hover"
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Role
@@ -190,7 +190,7 @@ const UserManagement = () => {
                       {role.permissions.map((permission) => (
                         <span
                           key={permission.name}
-                          className="px-2 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800"
+                          className="px-2 py-1 text-xs font-medium rounded-full bg-indigo-100 text-secondary"
                         >
                           {permission.name}
                         </span>
@@ -210,7 +210,7 @@ const UserManagement = () => {
                         });
                         setShowRoleModal(true);
                       }}
-                      className="text-indigo-600 hover:text-indigo-900"
+                      className="text-primary hover:text-primary-hover"
                     >
                       <Edit2 className="h-4 w-4" />
                     </button>
@@ -241,7 +241,7 @@ const UserManagement = () => {
                 resetStaff();
                 setShowStaffModal(true);
               }}
-              className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+              className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-hover"
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Staff
@@ -265,7 +265,7 @@ const UserManagement = () => {
                       >
                         {member.status}
                       </span>
-                      <span className="ml-2 px-2 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800">
+                      <span className="ml-2 px-2 py-1 text-xs font-medium rounded-full bg-indigo-100 text-secondary">
                         {member.role.name}
                       </span>
                     </div>
@@ -281,7 +281,7 @@ const UserManagement = () => {
                         });
                         setShowStaffModal(true);
                       }}
-                      className="text-indigo-600 hover:text-indigo-900"
+                      className="bg-primary hover:bg-primary-hover"
                     >
                       <Edit2 className="h-4 w-4" />
                     </button>
@@ -355,7 +355,7 @@ const UserManagement = () => {
                             );
                           }
                         }}
-                        className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        className="rounded border-gray-300 bg-primary shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                       />
                       <span className="ml-2 text-sm text-gray-900">
                         {permission.description}
@@ -380,7 +380,7 @@ const UserManagement = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-hover"
                 >
                   {editingRole ? "Update" : "Create"}
                 </button>
@@ -469,7 +469,7 @@ const UserManagement = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-hover"
                 >
                   {editingStaff ? "Update" : "Create"}
                 </button>
