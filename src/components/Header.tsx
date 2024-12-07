@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { Menu as MenuIcon, Bell, LogOut, Settings, User } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { MenuIcon, Bell, LogOut, Settings, User } from 'lucide-react';
 import { RootState } from "../store";
 import { logout } from "../store/slices/authSlice";
 import NotificationList from "./notifications/NotificationList";
 import { useGetNotificationsQuery } from "../store/services/notificationService";
 import { PERMISSIONS, hasPermission } from "../utils/permissions";
+import UserProfileModal from "./header/UserProfileModal";
 
 interface Staff {
   role?: {
@@ -18,6 +19,7 @@ interface Staff {
 const Header = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const user = useSelector((state: RootState) => state.auth.user);
   const { staff } = useSelector((state: RootState) => state.auth) as {
     staff: Staff;
@@ -93,7 +95,8 @@ const Header = () => {
                 <div className="py-1">
                   <button
                     onClick={() => {
-                      navigate("/user/profile");
+                      setShowProfileModal(true);
+                      setShowUserMenu(false);
                     }}
                     className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                   >
@@ -101,7 +104,10 @@ const Header = () => {
                     Profile
                   </button>
                   <button
-                    onClick={() => navigate("/user/settings")}
+                    onClick={() => {
+                      setShowProfileModal(true);
+                      setShowUserMenu(false);
+                    }}
                     className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                   >
                     <Settings className="h-4 w-4 mr-3" />
@@ -120,6 +126,11 @@ const Header = () => {
           </div>
         </div>
       </div>
+
+      <UserProfileModal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+      />
     </header>
   );
 };

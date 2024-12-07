@@ -1,25 +1,30 @@
 import React from 'react';
 import { format } from 'date-fns';
-import { Edit2, AlertTriangle } from 'lucide-react';
+import { Edit2, AlertTriangle, Clock } from 'lucide-react';
 import { Product } from '../../store/services/productService';
 import { StoreSettings } from '../../store/services/storeService';
 import { getStockStatusColor, checkStockLevel } from '../../utils/inventory';
+import { Category } from '../../store/services/categoryService';
 
 interface InventoryListProps {
   products: Product[];
   storeSettings: StoreSettings;
   onEdit: (product: Product) => void;
+  onViewHistory: (product: Product) => void;
   currentPage: number;
   itemsPerPage: number;
+  categories: Category[];
 }
 
-const InventoryList = ({
+const InventoryList: React.FC<InventoryListProps> = ({
   products,
   storeSettings,
   onEdit,
+  onViewHistory,
   currentPage,
   itemsPerPage,
-}: InventoryListProps) => {
+  categories,
+}) => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const displayedProducts = products.slice(startIndex, endIndex);
@@ -36,6 +41,11 @@ const InventoryList = ({
       default:
         return { text: 'In Stock', icon: false };
     }
+  };
+
+  const getCategoryName = (categoryId: string) => {
+    const category = categories.find(cat => cat._id === categoryId);
+    return category ? category.name : 'Uncategorized';
   };
 
   return (
@@ -90,7 +100,7 @@ const InventoryList = ({
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {product.category}
+                  {getCategoryName(product.category)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
@@ -114,9 +124,15 @@ const InventoryList = ({
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button
                     onClick={() => onEdit(product)}
-                    className="text-indigo-600 hover:text-indigo-900"
+                    className="text-indigo-600 hover:text-indigo-900 mr-2"
                   >
                     <Edit2 className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => onViewHistory(product)}
+                    className="text-indigo-600 hover:text-indigo-900"
+                  >
+                    <Clock className="h-4 w-4" />
                   </button>
                 </td>
               </tr>
@@ -129,3 +145,4 @@ const InventoryList = ({
 };
 
 export default InventoryList;
+

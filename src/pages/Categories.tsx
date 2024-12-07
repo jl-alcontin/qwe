@@ -116,7 +116,7 @@ const Categories = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
                       onClick={() => handleEdit(category)}
-                      className="text-indigo-600 hover:text-indigo-900 mr-4"
+                      className="text-primary hover:text-primary-hover mr-4"
                     >
                       <Edit2 className="h-4 w-4" />
                     </button>

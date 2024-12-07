@@ -25,7 +25,7 @@ const SalesChart = ({ data }: SalesChartProps) => {
           <XAxis dataKey="name" />
           <YAxis />
           <Tooltip />
-          <Bar dataKey="sales" fill="#4f46e5" />
+          <Bar dataKey="sales" className='fill-primary' />
         </BarChart>
       </ResponsiveContainer>
     </div>

@@ -192,7 +192,7 @@ const Products = () => {
                       setModifiers(product.modifiers || []);
                       setIsModalOpen(true);
                     }}
-                    className="text-indigo-600 hover:text-indigo-900"
+                    className="text-primary hover:text-primary-hover"
                   >
                     <Edit2 className="h-4 w-4" />
                   </button>

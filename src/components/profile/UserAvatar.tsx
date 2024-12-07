@@ -38,7 +38,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
 
   return (
     <div
-      className={`${sizeClasses[size]} rounded-full bg-indigo-600 flex items-center justify-center`}
+      className={`${sizeClasses[size]} rounded-full bg-primary flex items-center justify-center`}
     >
       <span className="font-medium text-white">
         {getInitials(name)}

@@ -281,7 +281,7 @@ const UserManagement = () => {
                         });
                         setShowStaffModal(true);
                       }}
-                      className="bg-primary hover:bg-primary-hover"
+                      className="text-primary hover:text-primary-hover"
                     >
                       <Edit2 className="h-4 w-4" />
                     </button>
