@@ -24,7 +24,8 @@ export const api = createApi({
     "Roles",
     "Staff",
     "Notifications",
-    "User"
+    "User",
+    "Inventory"
   ],
   keepUnusedDataFor: 0, // Immediately remove unused data
 });

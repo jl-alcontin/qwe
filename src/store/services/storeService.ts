@@ -1,12 +1,24 @@
 import { api } from '../api';
 import { createNotification, getStoreCreatedMessage } from '../../utils/notification';
 
+export interface StoreSettings {
+  lowStockThreshold: number;
+  enableNotifications: boolean;
+  automaticReorder: boolean;
+  reorderPoint: number;
+  taxRate: number;
+  currency: string;
+  timeZone: string;
+  receiptFooter: string;
+}
+
 export interface Store {
   _id: string;
   name: string;
   address: string;
   phone: string;
   owner: string;
+  settings?: StoreSettings;
   createdAt: string;
   updatedAt: string;
 }
@@ -15,6 +27,14 @@ export interface CreateStoreRequest {
   name: string;
   address: string;
   phone: string;
+}
+
+export interface UpdateStoreRequest {
+  _id: string;
+  name?: string;
+  address?: string;
+  phone?: string;
+  settings?: Partial<StoreSettings>;
 }
 
 export const storeApi = api.injectEndpoints({
@@ -48,7 +68,7 @@ export const storeApi = api.injectEndpoints({
       query: (id) => `stores/${id}`,
       providesTags: (result, error, id) => [{ type: 'Stores', id }],
     }),
-    updateStore: builder.mutation<Store, Partial<Store> & Pick<Store, '_id'>>({
+    updateStore: builder.mutation<Store, UpdateStoreRequest>({
       query: ({ _id, ...patch }) => ({
         url: `stores/${_id}`,
         method: 'PUT',

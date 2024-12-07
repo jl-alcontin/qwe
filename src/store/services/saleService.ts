@@ -1,5 +1,10 @@
-import { api } from '../api';
-import { CartItem } from '../../components/sales/types';
+import { api } from "../api";
+import {
+  createNotification,
+  getLowStockMessage,
+} from "../../utils/notification";
+import { CartItem } from "../../components/sales/types";
+import { productApi } from "./productService";
 
 export interface Sale {
   _id: string;
@@ -20,15 +25,15 @@ export interface Sale {
     }>;
     discounts: Array<{
       name: string;
-      type: 'percentage' | 'fixed';
+      type: "percentage" | "fixed";
       value: number;
     }>;
     price: number;
   }>;
   total: number;
-  paymentMethod: 'cash' | 'card' | 'qr';
-  paymentDetails: any;
-  status: 'completed' | 'refunded';
+  paymentMethod: "cash" | "card" | "qr";
+  paymentDetails: Record<string, unknown>;
+  status: "completed" | "refunded";
   createdAt: string;
   updatedAt: string;
 }
@@ -47,14 +52,14 @@ export interface CreateSaleRequest {
     }>;
     discounts: Array<{
       name: string;
-      type: 'percentage' | 'fixed';
+      type: "percentage" | "fixed";
       value: number;
     }>;
     price: number;
   }>;
   total: number;
-  paymentMethod: 'cash' | 'card' | 'qr';
-  paymentDetails: any;
+  paymentMethod: "cash" | "card" | "qr";
+  paymentDetails: Record<string, unknown>;
 }
 
 export interface SaleMetrics {
@@ -67,27 +72,61 @@ export const saleApi = api.injectEndpoints({
   endpoints: (builder) => ({
     createSale: builder.mutation<Sale, CreateSaleRequest>({
       query: (saleData) => ({
-        url: 'sales',
-        method: 'POST',
+        url: "sales",
+        method: "POST",
         body: saleData,
       }),
-      invalidatesTags: ['Sales', 'Products'], // Add 'Products' to invalidate the products cache
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+
+          // Use the productApi to fetch products instead of using fetch directly
+          const productsResult = await dispatch(
+            productApi.endpoints.getProducts.initiate(arg.store)
+          );
+
+          if (productsResult.data) {
+            // Check stock levels after sale
+            productsResult.data.forEach(
+              (product: { name: string; stock: number }) => {
+                if (product.stock <= 10) {
+                  createNotification(
+                    dispatch,
+                    getLowStockMessage(product.name, product.stock),
+                    "alert",
+                    arg.store
+                  );
+                }
+              }
+            );
+          } else {
+            throw new Error("Failed to fetch products");
+          }
+        } catch (error) {
+          console.error("Error in createSale:", error);
+          // Handle error if needed
+        }
+      },
+      invalidatesTags: ["Sales", "Products", "Inventory"],
     }),
     getSales: builder.query<Sale[], string>({
       query: (storeId) => `sales/${storeId}`,
-      providesTags: ['Sales'],
+      providesTags: ["Sales"],
     }),
-    getSaleMetrics: builder.query<SaleMetrics, { storeId: string; startDate: string; endDate: string }>({
-      query: ({ storeId, startDate, endDate }) => 
+    getSaleMetrics: builder.query<
+      SaleMetrics,
+      { storeId: string; startDate: string; endDate: string }
+    >({
+      query: ({ storeId, startDate, endDate }) =>
         `sales/${storeId}/metrics?startDate=${startDate}&endDate=${endDate}`,
-      providesTags: ['Sales'],
+      providesTags: ["Sales"],
     }),
     refundSale: builder.mutation<Sale, string>({
       query: (saleId) => ({
         url: `sales/${saleId}/refund`,
-        method: 'POST',
+        method: "POST",
       }),
-      invalidatesTags: ['Sales', 'Products'], // Add 'Products' to invalidate the products cache
+      invalidatesTags: ["Sales", "Products", "Inventory"],
     }),
   }),
 });

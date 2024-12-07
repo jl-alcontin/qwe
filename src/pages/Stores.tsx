@@ -1,10 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Store, Plus, Edit2, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { useGetStoresQuery, useDeleteStoreMutation } from '../store/services/storeService';
+import { useGetStoresQuery, useDeleteStoreMutation, useUpdateStoreMutation } from '../store/services/storeService';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
+
+interface EditStoreForm {
+  name: string;
+  address: string;
+  phone: string;
+}
 
 const Stores = () => {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -13,13 +19,16 @@ const Stores = () => {
     refetchOnMountOrArgChange: true,
   });
   const [deleteStore] = useDeleteStoreMutation();
+  const [updateStore] = useUpdateStoreMutation();
   const navigate = useNavigate();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingStore, setEditingStore] = useState<any>(null);
 
   useEffect(() => {
     if (user) {
       refetch();
     }
-  }, [user?.email, refetch]); // Use user.email as dependency to ensure proper updates
+  }, [user?.email, refetch]);
 
   const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this store?')) {
@@ -37,7 +46,29 @@ const Stores = () => {
     navigate(`/stores/${storeId}/dashboard`);
   };
 
-  // Show loading state when user exists but data is loading
+  const handleEdit = (store: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingStore(store);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateStore = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await updateStore({
+        _id: editingStore._id,
+        name: editingStore.name,
+        address: editingStore.address,
+        phone: editingStore.phone,
+      }).unwrap();
+      toast.success('Store updated successfully');
+      setIsEditModalOpen(false);
+      setEditingStore(null);
+    } catch (error) {
+      toast.error('Failed to update store');
+    }
+  };
+
   if (!user || isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -115,10 +146,7 @@ const Stores = () => {
               <div className="bg-gray-50 px-5 py-3">
                 <div className="flex justify-end space-x-3">
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/stores/${store._id}/categories`);
-                    }}
+                    onClick={(e) => handleEdit(store, e)}
                     className="text-primary hover:text-primary-hover"
                   >
                     <Edit2 className="h-4 w-4" />
@@ -136,6 +164,68 @@ const Stores = () => {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Edit Store Modal */}
+      {isEditModalOpen && editingStore && (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h2 className="text-xl font-semibold mb-4">Edit Store</h2>
+            <form onSubmit={handleUpdateStore} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Store Name</label>
+                <input
+                  type="text"
+                  value={editingStore.name}
+                  onChange={(e) => setEditingStore({ ...editingStore, name: e.target.value })}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Address</label>
+                <textarea
+                  value={editingStore.address}
+                  onChange={(e) => setEditingStore({ ...editingStore, address: e.target.value })}
+                  rows={3}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Phone Number</label>
+                <input
+                  type="tel"
+                  value={editingStore.phone}
+                  onChange={(e) => setEditingStore({ ...editingStore, phone: e.target.value })}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  required
+                />
+              </div>
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEditModalOpen(false);
+                    setEditingStore(null);
+                  }}
+                  className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+                >
+                  Update Store
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

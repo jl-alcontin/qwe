@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Settings as SettingsIcon, Save } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useGetStoreQuery, useUpdateStoreMutation } from '../store/services/storeService';
+import type { StoreSettings } from '../store/services/storeService';
 
 const Settings = () => {
   const { storeId } = useParams<{ storeId: string }>();
   const { data: store } = useGetStoreQuery(storeId!);
   const [updateStore] = useUpdateStoreMutation();
 
-  const [settings, setSettings] = useState({
+  const [settings, setSettings] = useState<StoreSettings>({
     lowStockThreshold: 10,
     enableNotifications: true,
     automaticReorder: false,
@@ -19,6 +20,12 @@ const Settings = () => {
     timeZone: 'UTC',
     receiptFooter: '',
   });
+
+  useEffect(() => {
+    if (store?.settings) {
+      setSettings(store.settings);
+    }
+  }, [store]);
 
   const handleSave = async () => {
     try {
