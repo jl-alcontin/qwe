@@ -1,6 +1,6 @@
 import { api } from "../api";
-// import { createNotification, getLowStockMessage } from '../../utils/notifications';
-import { createNotification, getLowStockMessage } from "../../utils/notification";
+import { createNotification } from "../../utils/notification";
+import { getStockAlertMessage, shouldCreateStockAlert } from "../../utils/inventory";
 
 export interface Product {
   _id: string;
@@ -48,29 +48,27 @@ export const productApi = api.injectEndpoints({
       providesTags: ["Products"],
       async onCacheEntryAdded(
         arg,
-        { updateCachedData, cacheDataLoaded, cacheEntryRemoved, dispatch }
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved, dispatch, getState }
       ) {
         try {
           await cacheDataLoaded;
 
-          const checkLowStock = (products: Product[]) => {
+          const state = getState() as any;
+          const store = state.api.queries[`getStore(${arg})`]?.data;
+
+          if (store?.settings) {
+            const products = await cacheDataLoaded;
             products.forEach((product) => {
-              if (product.stock <= 10) {
-                createNotification(
-                  dispatch,
-                  getLowStockMessage(product.name, product.stock),
-                  'alert',
-                  product.store
-                );
+              if (shouldCreateStockAlert(product.stock, store.settings)) {
+                const message = getStockAlertMessage(product.name, product.stock, store.settings);
+                createNotification(dispatch, message, 'alert', product.store);
               }
             });
-          };
-
-          checkLowStock(await cacheDataLoaded);
+          }
 
           await cacheEntryRemoved;
-        } catch {
-          // Handle error if needed
+        } catch (error) {
+          console.error('Error checking product stock levels:', error);
         }
       },
     }),

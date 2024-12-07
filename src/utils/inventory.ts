@@ -26,14 +26,34 @@ export const shouldCreateStockAlert = (
   );
 };
 
+export const getStockAlertMessage = (
+  productName: string,
+  currentStock: number,
+  settings: StoreSettings
+): string => {
+  if (currentStock <= settings.outOfStockThreshold) {
+    return `Out of stock alert: ${productName} is out of stock!`;
+  }
+  if (currentStock <= settings.criticalStockThreshold) {
+    return `Critical stock alert: ${productName} has critically low stock (${currentStock} units)`;
+  }
+  if (currentStock <= settings.lowStockThreshold) {
+    return `Low stock alert: ${productName} is running low (${currentStock} units)`;
+  }
+  return '';
+};
+
 export const getStockAlertType = (
   currentStock: number,
   settings: StoreSettings
-): 'out_of_stock' | 'low_stock' | null => {
+): 'out_of_stock' | 'low_stock' | 'critical' | null => {
   if (!settings.enableStockAlerts) return null;
   
   if (currentStock <= settings.outOfStockThreshold) {
     return 'out_of_stock';
+  }
+  if (currentStock <= settings.criticalStockThreshold) {
+    return 'critical';
   }
   if (currentStock <= settings.lowStockThreshold) {
     return 'low_stock';
@@ -41,11 +61,16 @@ export const getStockAlertType = (
   return null;
 };
 
-export const getStockAlertThreshold = (
-  alertType: 'out_of_stock' | 'low_stock',
-  settings: StoreSettings
-): number => {
-  return alertType === 'out_of_stock'
-    ? settings.outOfStockThreshold
-    : settings.lowStockThreshold;
+export const getStockStatusColor = (currentStock: number, settings: StoreSettings): string => {
+  const status = checkStockLevel(currentStock, settings);
+  switch (status) {
+    case 'out_of_stock':
+      return 'text-red-600';
+    case 'critical':
+      return 'text-orange-600';
+    case 'low':
+      return 'text-yellow-600';
+    default:
+      return 'text-green-600';
+  }
 };
