@@ -1,5 +1,52 @@
 import mongoose from 'mongoose';
 
+const settingsSchema = new mongoose.Schema({
+  lowStockThreshold: {
+    type: Number,
+    default: 10
+  },
+  outOfStockThreshold: {
+    type: Number,
+    default: 0
+  },
+  criticalStockThreshold: {
+    type: Number,
+    default: 5
+  },
+  enableStockAlerts: {
+    type: Boolean,
+    default: true
+  },
+  enableNotifications: {
+    type: Boolean,
+    default: true
+  },
+  automaticReorder: {
+    type: Boolean,
+    default: false
+  },
+  reorderPoint: {
+    type: Number,
+    default: 5
+  },
+  taxRate: {
+    type: Number,
+    default: 0
+  },
+  currency: {
+    type: String,
+    default: 'USD'
+  },
+  timeZone: {
+    type: String,
+    default: 'UTC'
+  },
+  receiptFooter: {
+    type: String,
+    default: ''
+  }
+});
+
 const storeSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -17,6 +64,10 @@ const storeSchema = new mongoose.Schema({
   phone: {
     type: String,
     required: true
+  },
+  settings: {
+    type: settingsSchema,
+    default: () => ({})
   },
   categories: [{
     type: mongoose.Schema.Types.ObjectId,

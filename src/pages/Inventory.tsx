@@ -10,16 +10,19 @@ import {
 import { toast } from "react-hot-toast";
 import { format } from "date-fns";
 import { useGetProductsQuery } from "../store/services/productService";
+import { useGetStoreQuery } from "../store/services/storeService";
 import {
   useGetStockMovementsQuery,
   useAddStockMovementMutation,
   useGetStockAlertsQuery,
   useUpdateStockAlertMutation,
 } from "../store/services/inventoryService";
+import { checkStockLevel, shouldCreateStockAlert } from "../utils/inventory";
 
 const Inventory = () => {
   const { storeId } = useParams<{ storeId: string }>();
   const { data: products } = useGetProductsQuery(storeId!);
+  const { data: store } = useGetStoreQuery(storeId!);
   const { data: stockMovements } = useGetStockMovementsQuery(storeId!);
   const { data: stockAlerts } = useGetStockAlertsQuery(storeId!);
   const [addStockMovement] = useAddStockMovementMutation();
@@ -34,6 +37,19 @@ const Inventory = () => {
   const handleAddMovement = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const selectedProductData = products?.find(p => p._id === selectedProduct);
+      if (!selectedProductData) return;
+
+      const newStock = movementType === "in" 
+        ? selectedProductData.stock + quantity 
+        : selectedProductData.stock - quantity;
+
+      // Check if this movement would trigger stock alerts based on settings
+      if (store?.settings && shouldCreateStockAlert(newStock, store.settings)) {
+        const stockLevel = checkStockLevel(newStock, store.settings);
+        toast.warning(`Stock ${stockLevel} alert will be triggered for ${selectedProductData.name}`);
+      }
+
       await addStockMovement({
         product: selectedProduct,
         type: movementType,
@@ -41,6 +57,7 @@ const Inventory = () => {
         reason,
         store: storeId,
       }).unwrap();
+      
       toast.success("Stock movement recorded successfully");
       setShowMovementModal(false);
       resetForm();
@@ -65,6 +82,22 @@ const Inventory = () => {
       toast.success("Alert marked as resolved");
     } catch (error) {
       toast.error("Failed to update alert");
+    }
+  };
+
+  const getStockStatusColor = (stock: number) => {
+    if (!store?.settings) return "text-gray-600";
+    
+    const status = checkStockLevel(stock, store.settings);
+    switch (status) {
+      case "out_of_stock":
+        return "text-red-600";
+      case "critical":
+        return "text-orange-600";
+      case "low":
+        return "text-yellow-600";
+      default:
+        return "text-green-600";
     }
   };
 
@@ -153,46 +186,57 @@ const Inventory = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {stockMovements?.map((movement) => (
-                  <tr key={movement._id}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {products?.find((p) => p._id === movement.product)?.name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          movement.type === "in"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {movement.type === "in" ? (
-                          <ArrowUp className="h-3 w-3 mr-1" />
-                        ) : (
-                          <ArrowDown className="h-3 w-3 mr-1" />
+                {stockMovements?.map((movement) => {
+                  const product = products?.find((p) => p._id === movement.product);
+                  return (
+                    <tr key={movement._id}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {product?.name}
+                          </div>
+                          <div className={`text-sm ${getStockStatusColor(product?.stock || 0)}`}>
+                            Current Stock: {product?.stock}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            movement.type === "in"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {movement.type === "in" ? (
+                            <ArrowUp className="h-3 w-3 mr-1" />
+                          ) : (
+                            <ArrowDown className="h-3 w-3 mr-1" />
+                          )}
+                          {movement.type.toUpperCase()}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {Math.abs(movement.quantity)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {movement.reason}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {format(
+                          new Date(movement.createdAt),
+                          "MMM dd, yyyy HH:mm"
                         )}
-                        {movement.type.toUpperCase()}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {Math.abs(movement.quantity)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {movement.reason}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {format(
-                        new Date(movement.createdAt),
-                        "MMM dd, yyyy HH:mm"
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         </div>
       </div>
+
       {/* Stock Movement Modal */}
       {showMovementModal && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
@@ -214,7 +258,7 @@ const Inventory = () => {
                   <option value="">Select product</option>
                   {products?.map((product) => (
                     <option key={product._id} value={product._id}>
-                      {product.name}
+                      {product.name} (Current Stock: {product.stock})
                     </option>
                   ))}
                 </select>

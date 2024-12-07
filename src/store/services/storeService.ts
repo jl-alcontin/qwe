@@ -3,6 +3,9 @@ import { createNotification, getStoreCreatedMessage } from '../../utils/notifica
 
 export interface StoreSettings {
   lowStockThreshold: number;
+  outOfStockThreshold: number;
+  criticalStockThreshold: number;
+  enableStockAlerts: boolean;
   enableNotifications: boolean;
   automaticReorder: boolean;
   reorderPoint: number;

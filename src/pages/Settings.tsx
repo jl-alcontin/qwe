@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Settings as SettingsIcon, Save } from 'lucide-react';
+import { Settings as SettingsIcon, Save, AlertTriangle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useGetStoreQuery, useUpdateStoreMutation } from '../store/services/storeService';
 import type { StoreSettings } from '../store/services/storeService';
@@ -12,6 +12,9 @@ const Settings = () => {
 
   const [settings, setSettings] = useState<StoreSettings>({
     lowStockThreshold: 10,
+    outOfStockThreshold: 0,
+    criticalStockThreshold: 5,
+    enableStockAlerts: true,
     enableNotifications: true,
     automaticReorder: false,
     reorderPoint: 5,
@@ -57,127 +60,159 @@ const Settings = () => {
 
       <div className="bg-white shadow rounded-lg">
         <div className="p-6 space-y-6">
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Low Stock Threshold
-              </label>
-              <input
-                type="number"
-                value={settings.lowStockThreshold}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    lowStockThreshold: parseInt(e.target.value),
-                  })
-                }
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-              />
-              <p className="mt-1 text-sm text-gray-500">
-                Alert when product stock falls below this number
-              </p>
+          {/* Stock Management Settings */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-medium text-gray-900 flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              Stock Alert Settings
+            </h2>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              {[
+                {
+                  label: 'Low Stock Threshold',
+                  value: settings.lowStockThreshold,
+                  key: 'lowStockThreshold',
+                  helper: 'Alert when product stock falls below this number',
+                },
+                {
+                  label: 'Critical Stock Threshold',
+                  value: settings.criticalStockThreshold,
+                  key: 'criticalStockThreshold',
+                  helper: 'Urgent alert when stock reaches critical level',
+                },
+                {
+                  label: 'Out of Stock Threshold',
+                  value: settings.outOfStockThreshold,
+                  key: 'outOfStockThreshold',
+                  helper: 'Consider product out of stock at this level',
+                },
+                {
+                  label: 'Reorder Point',
+                  value: settings.reorderPoint,
+                  key: 'reorderPoint',
+                  helper: 'Stock level at which to reorder inventory',
+                },
+              ].map(({ label, value, key, helper }) => (
+                <div key={key}>
+                  <label className="block text-sm font-medium text-gray-700">{label}</label>
+                  <input
+                    type="number"
+                    value={value}
+                    onChange={(e) =>
+                      setSettings((prev) => ({
+                        ...prev,
+                        [key]: parseInt(e.target.value, 10) || 0,
+                      }))
+                    }
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  />
+                  <p className="mt-1 text-sm text-gray-500">{helper}</p>
+                </div>
+              ))}
             </div>
+            <div className="space-y-4">
+              {[
+                {
+                  label: 'Enable Stock Alerts',
+                  checked: settings.enableStockAlerts,
+                  key: 'enableStockAlerts',
+                },
+                {
+                  label: 'Enable Automatic Reorder',
+                  checked: settings.automaticReorder,
+                  key: 'automaticReorder',
+                },
+              ].map(({ label, checked, key }) => (
+                <div className="flex items-center" key={key}>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={(e) =>
+                      setSettings((prev) => ({
+                        ...prev,
+                        [key]: e.target.checked,
+                      }))
+                    }
+                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  />
+                  <label className="ml-2 block text-sm text-gray-900">{label}</label>
+                </div>
+              ))}
+            </div>
+          </div>
 
+          {/* General Settings */}
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            {[
+              {
+                label: 'Currency',
+                value: settings.currency,
+                key: 'currency',
+                options: [
+                  { value: 'USD', label: 'USD ($)' },
+                  { value: 'EUR', label: 'EUR (€)' },
+                  { value: 'GBP', label: 'GBP (£)' },
+                  { value: 'JPY', label: 'JPY (¥)' },
+                ],
+              },
+              {
+                label: 'Time Zone',
+                value: settings.timeZone,
+                key: 'timeZone',
+                options: [
+                  { value: 'UTC', label: 'UTC' },
+                  { value: 'America/New_York', label: 'Eastern Time' },
+                  { value: 'America/Chicago', label: 'Central Time' },
+                  { value: 'America/Denver', label: 'Mountain Time' },
+                  { value: 'America/Los_Angeles', label: 'Pacific Time' },
+                ],
+              },
+            ].map(({ label, value, key, options }) => (
+              <div key={key}>
+                <label className="block text-sm font-medium text-gray-700">{label}</label>
+                <select
+                  value={value}
+                  onChange={(e) =>
+                    setSettings((prev) => ({
+                      ...prev,
+                      [key]: e.target.value,
+                    }))
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                >
+                  {options.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ))}
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Tax Rate (%)
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Tax Rate (%)</label>
               <input
                 type="number"
                 step="0.01"
                 value={settings.taxRate}
                 onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    taxRate: parseFloat(e.target.value),
-                  })
+                  setSettings((prev) => ({
+                    ...prev,
+                    taxRate: parseFloat(e.target.value) || 0,
+                  }))
                 }
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
               />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Currency
-              </label>
-              <select
-                value={settings.currency}
-                onChange={(e) =>
-                  setSettings({ ...settings, currency: e.target.value })
-                }
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-              >
-                <option value="USD">USD ($)</option>
-                <option value="EUR">EUR (€)</option>
-                <option value="GBP">GBP (£)</option>
-                <option value="JPY">JPY (¥)</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Time Zone
-              </label>
-              <select
-                value={settings.timeZone}
-                onChange={(e) =>
-                  setSettings({ ...settings, timeZone: e.target.value })
-                }
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-              >
-                <option value="UTC">UTC</option>
-                <option value="America/New_York">Eastern Time</option>
-                <option value="America/Chicago">Central Time</option>
-                <option value="America/Denver">Mountain Time</option>
-                <option value="America/Los_Angeles">Pacific Time</option>
-              </select>
             </div>
           </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                checked={settings.enableNotifications}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    enableNotifications: e.target.checked,
-                  })
-                }
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              <label className="ml-2 block text-sm text-gray-900">
-                Enable Notifications
-              </label>
-            </div>
-
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                checked={settings.automaticReorder}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    automaticReorder: e.target.checked,
-                  })
-                }
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              <label className="ml-2 block text-sm text-gray-900">
-                Automatic Reorder
-              </label>
-            </div>
-          </div>
-
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Receipt Footer Message
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Receipt Footer Message</label>
             <textarea
               value={settings.receiptFooter}
               onChange={(e) =>
-                setSettings({ ...settings, receiptFooter: e.target.value })
+                setSettings((prev) => ({
+                  ...prev,
+                  receiptFooter: e.target.value,
+                }))
               }
               rows={3}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
