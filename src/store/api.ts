@@ -4,7 +4,7 @@ import { logout } from "./slices/authSlice";
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_API_URL,
+    baseUrl: "http://localhost:3000/api",
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as RootState).auth.token;
       if (token) {
@@ -23,7 +23,8 @@ export const api = createApi({
     "Discounts",
     "Roles",
     "Staff",
-    "Notifications"
+    "Notifications",
+    "User"
   ],
   keepUnusedDataFor: 0, // Immediately remove unused data
 });

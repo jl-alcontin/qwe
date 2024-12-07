@@ -13,6 +13,7 @@ import inventoryRoutes from "../backend/routes/inventoryRoutes.js";
 import roleRoutes from "../backend/routes/roleRoutes.js";
 import staffRoutes from "../backend/routes/staffRoutes.js";
 import notificationRoutes from "../backend/routes/notificationRoutes.js";
+import userRoutes from "../backend/routes/userRoutes.js";
 import testRoutes from "../backend/routes/testRoute.js";
 
 dotenv.config();
@@ -55,6 +56,8 @@ app.use("/api/inventory", inventoryRoutes);
 app.use("/api/roles", roleRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/users", userRoutes);
+
 app.use("/api/test", testRoutes);
 
 app.use((err, req, res, next) => {

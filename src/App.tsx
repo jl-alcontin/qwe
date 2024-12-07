@@ -26,6 +26,9 @@ import Unauthorized from "./pages/Unauthorized";
 import Settings from "./pages/Settings";
 import { RootState } from "./store";
 import { PERMISSIONS } from "./utils/permissions";
+import Profile from "./pages/Profile";
+import UserSettings from "./pages/UserSettings";
+
 
 function App() {
   const { token, staff } = useSelector((state: RootState) => state.auth);
@@ -78,6 +81,9 @@ function App() {
             )
           }
         />
+        <Route path="user/profile" element={<Profile />} />
+        <Route path="user/settings" element={<UserSettings />} />
+
         {/* <Route path="stores/:storeId/settings" element={staff ? <Navigate to={`/stores/${staff.store}/settings`} replace /> : <Settings />} /> */}
 
         <Route

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Menu as MenuIcon, Bell, LogOut, Settings, User } from "lucide-react";
 import { RootState } from "../store";
 import { logout } from "../store/slices/authSlice";
@@ -91,15 +91,16 @@ const Header = () => {
             {showUserMenu && (
               <div className="absolute right-0 md:left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                 <div className="py-1">
-                  <button
-                    onClick={() => {
-                      alert("Profile to be implemented");
-                    }}
+                  <Link
+                    // onClick={() => {
+                    //   alert("Profile to be implemented");
+                    // }}
+                    to={"user/profile"}
                     className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                   >
                     <User className="h-4 w-4 mr-3" />
                     Profile
-                  </button>
+                  </Link>
                   <button
                     onClick={() => alert("Settings to be implemented")}
                     className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
