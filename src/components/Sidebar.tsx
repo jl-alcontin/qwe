@@ -47,7 +47,7 @@ const NavItem = ({ to, icon: Icon, children, permission }: NavItemProps) => {
     }
   }
 
-  console.log(permission)
+  console.log(permission);
 
   return (
     <Link
@@ -170,20 +170,17 @@ const Sidebar = () => {
               >
                 Users
               </NavItem>
+              <NavItem
+                to={`/stores/${storeId}/settings`}
+                icon={Settings}
+                permission={PERMISSIONS.MANAGE_SETTINGS}
+              >
+                Settings
+              </NavItem>
               {!staff && (
-                <>
-                  <NavItem
-                    to={`/stores/${storeId}/settings`}
-                    icon={Settings}
-                    permission={PERMISSIONS.MANAGE_SETTINGS}
-                  >
-                    Settings
-                  </NavItem>
-
-                  <NavItem to="/stores" icon={Store}>
-                    Switch Store
-                  </NavItem>
-                </>
+                <NavItem to="/stores" icon={Store}>
+                  Switch Store
+                </NavItem>
               )}
             </>
           )}
