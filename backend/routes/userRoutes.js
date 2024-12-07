@@ -1,28 +1,27 @@
 import express from "express";
 import bcrypt from "bcryptjs";
-import multer from "multer";
 import { protect } from "../middleware/authMiddleware.js";
 import User from "../models/userModel.js";
 
 const router = express.Router();
 
 // Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: "uploads/",
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(
-      null,
-      file.fieldname +
-        "-" +
-        uniqueSuffix +
-        "." +
-        file.originalname.split(".").pop()
-    );
-  },
-});
+// const storage = multer.diskStorage({
+//   destination: "uploads/",
+//   filename: (req, file, cb) => {
+//     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+//     cb(
+//       null,
+//       file.fieldname +
+//         "-" +
+//         uniqueSuffix +
+//         "." +
+//         file.originalname.split(".").pop()
+//     );
+//   },
+// });
 
-const upload = multer({ storage });
+// const upload = multer({ storage });
 
 // Update profile
 router.put("/profile", protect, async (req, res) => {
@@ -47,25 +46,25 @@ router.put("/profile", protect, async (req, res) => {
 });
 
 // Update avatar
-router.put("/avatar", protect, upload.single("avatar"), async (req, res) => {
-  try {
-    const user = await User.findById(req.user._id);
-    if (user && req.file) {
-      user.avatar = `/uploads/${req.file.filename}`;
-      const updatedUser = await user.save();
-      res.json({
-        _id: updatedUser._id,
-        name: updatedUser.name,
-        email: updatedUser.email,
-        avatar: updatedUser.avatar,
-      });
-    } else {
-      res.status(404).json({ message: "User not found or no file uploaded" });
-    }
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-});
+// router.put("/avatar", protect, upload.single("avatar"), async (req, res) => {
+//   try {
+//     const user = await User.findById(req.user._id);
+//     if (user && req.file) {
+//       user.avatar = `/uploads/${req.file.filename}`;
+//       const updatedUser = await user.save();
+//       res.json({
+//         _id: updatedUser._id,
+//         name: updatedUser.name,
+//         email: updatedUser.email,
+//         avatar: updatedUser.avatar,
+//       });
+//     } else {
+//       res.status(404).json({ message: "User not found or no file uploaded" });
+//     }
+//   } catch (error) {
+//     res.status(400).json({ message: error.message });
+//   }
+// });
 
 // Update password
 router.put("/password", protect, async (req, res) => {

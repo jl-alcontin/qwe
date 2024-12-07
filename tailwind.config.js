@@ -1,6 +1,5 @@
 /** @type {import('tailwindcss').Config} */
 
-const colors = require("tailwindcss/colors");
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
@@ -11,7 +10,8 @@ export default {
         card: "hsl(var(--card))",
         "card-foreground": "hsl(var(--card-foreground))",
         primary: "hsl(var(--primary))",
-        "primary-foreground": "hsl(var(--primary-foreground))","primary-hover": "hsl(var(--primary-hover))",
+        "primary-foreground": "hsl(var(--primary-foreground))",
+        "primary-hover": "hsl(var(--primary-hover))",
         secondary: "hsl(var(--secondary))",
         "secondary-foreground": "hsl(var(--secondary-foreground))",
         muted: "hsl(var(--muted))",
@@ -26,10 +26,5 @@ export default {
       },
     },
   },
-  plugins: [
-    function ({ addVariant }) {
-      addVariant("dark", ".dark &");
-      addVariant("green", ".green &");
-    },
-  ],
+  plugins: [],
 };
