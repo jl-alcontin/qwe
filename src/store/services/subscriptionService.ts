@@ -56,11 +56,20 @@ export const subscriptionApi = api.injectEndpoints({
       invalidatesTags: ['CurrentSubscription'],
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
-          await queryFulfilled;
+          const { data: subscription } = await queryFulfilled;
+          
           // Force refetch current subscription after successful subscription
-          await dispatch(subscriptionApi.endpoints.getCurrentSubscription.initiate(undefined, { forceRefetch: true }));
+          await dispatch(
+            subscriptionApi.endpoints.getCurrentSubscription.initiate(undefined, { 
+              forceRefetch: true,
+              subscribe: false 
+            })
+          );
+
+          return subscription;
         } catch (error) {
           console.error('Error updating subscription:', error);
+          throw error;
         }
       },
     }),
@@ -73,11 +82,20 @@ export const subscriptionApi = api.injectEndpoints({
       invalidatesTags: ['CurrentSubscription'],
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
-          await queryFulfilled;
+          const { data: verifiedSubscription } = await queryFulfilled;
+          
           // Force refetch current subscription after verification
-          await dispatch(subscriptionApi.endpoints.getCurrentSubscription.initiate(undefined, { forceRefetch: true }));
+          await dispatch(
+            subscriptionApi.endpoints.getCurrentSubscription.initiate(undefined, { 
+              forceRefetch: true,
+              subscribe: false 
+            })
+          );
+
+          return verifiedSubscription;
         } catch (error) {
           console.error('Error verifying subscription:', error);
+          throw error;
         }
       },
     }),

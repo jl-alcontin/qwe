@@ -13,7 +13,7 @@ const paymongoAxios = axios.create({
   },
 });
 
-export const createSource = async (amount: number, type: 'gcash' | 'grab_pay' | 'paymaya') => {
+export const createSource = async (amount: number, type: 'gcash' | 'grab_pay' | 'maya') => {
   try {
     const response = await paymongoAxios.post('/sources', {
       data: {
@@ -104,3 +104,4 @@ export const getPaymentIntentStatus = async (paymentIntentId: string) => {
     throw error;
   }
 };
+

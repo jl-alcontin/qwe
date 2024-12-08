@@ -31,7 +31,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
 
   const handlePaymentSuccess = async (paymentId?: string) => {
     try {
-      // First verify the payment
+      // First verify the payment if we have a paymentId
       if (paymentId) {
         await verifySubscription({ paymentId }).unwrap();
       }
@@ -73,11 +73,12 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
         );
       case 'gcash':
       case 'grab_pay':
-      case 'paymaya':
+      case 'maya':
         return (
           <EWalletPayment
-            type={selectedMethod as 'gcash' | 'grab_pay' | 'paymaya'}
+            type={selectedMethod as 'gcash' | 'grab_pay' | 'maya'}
             amount={amount}
+            subscriptionId={subscriptionId}
             onSuccess={handlePaymentSuccess}
             onError={handlePaymentError}
           />

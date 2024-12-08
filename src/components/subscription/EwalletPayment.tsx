@@ -3,19 +3,28 @@ import { QRCodeSVG } from 'qrcode.react';
 import { createSource, getSourceStatus } from '../../utils/paymongo';
 import { toast } from 'react-hot-toast';
 import { AlertCircle } from 'lucide-react';
+import { useSubscribeMutation } from '../../store/services/subscriptionService';
 
 interface EWalletPaymentProps {
-  type: 'gcash' | 'grab_pay' | 'paymaya';
+  type: 'gcash' | 'grab_pay' | 'maya';
   amount: number;
+  subscriptionId: string;
   onSuccess: (sourceId: string) => void;
   onError: (error: string) => void;
 }
 
-const EWalletPayment: React.FC<EWalletPaymentProps> = ({ type, amount, onSuccess, onError }) => {
+const EWalletPayment: React.FC<EWalletPaymentProps> = ({ 
+  type, 
+  amount, 
+  subscriptionId,
+  onSuccess, 
+  onError 
+}) => {
   const [sourceData, setSourceData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [pollInterval, setPollInterval] = useState<NodeJS.Timeout | null>(null);
   const isDevelopment = import.meta.env.MODE === 'development';
+  const [subscribe] = useSubscribeMutation();
 
   useEffect(() => {
     const initializePayment = async () => {
@@ -29,8 +38,20 @@ const EWalletPayment: React.FC<EWalletPaymentProps> = ({ type, amount, onSuccess
             const status = await getSourceStatus(source.id);
             if (status.attributes.status === 'chargeable') {
               clearInterval(interval);
+              
+              // Update subscription with payment details
+              await subscribe({
+                subscriptionId,
+                paymentMethod: type,
+                paymentDetails: {
+                  paymentId: source.id,
+                  amount,
+                  status: 'completed'
+                }
+              }).unwrap();
+
               toast.success('Payment successful!');
-              onSuccess(source.id); // Pass the source ID to handle subscription update
+              onSuccess(source.id);
             } else if (status.attributes.status === 'expired' || status.attributes.status === 'cancelled') {
               clearInterval(interval);
               toast.error('Payment failed or expired');
@@ -61,7 +82,7 @@ const EWalletPayment: React.FC<EWalletPaymentProps> = ({ type, amount, onSuccess
         clearInterval(pollInterval);
       }
     };
-  }, [type, amount, onSuccess, onError]);
+  }, [type, amount, subscriptionId, onSuccess, onError, subscribe]);
 
   if (isLoading) {
     return (
@@ -122,3 +143,4 @@ const EWalletPayment: React.FC<EWalletPaymentProps> = ({ type, amount, onSuccess
 };
 
 export default EWalletPayment;
+
