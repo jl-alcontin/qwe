@@ -47,8 +47,6 @@ const NavItem = ({ to, icon: Icon, children, permission }: NavItemProps) => {
     }
   }
 
-  console.log(permission);
-
   return (
     <Link
       to={to}
@@ -69,11 +67,14 @@ const Sidebar = () => {
   const { storeId } = useParams();
   const { staff, user } = useSelector((state: RootState) => state.auth);
   const { isOpen, setIsOpen, toggle } = useSidebarStore();
+  const [isMobile, setIsMobile] = React.useState(false);
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setIsOpen(false);
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (!mobile && !isOpen) {
+        setIsOpen(true);
       }
     };
 
@@ -81,7 +82,7 @@ const Sidebar = () => {
     handleResize(); // Call once to set initial state
 
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [isOpen, setIsOpen]);
 
   const handleLogout = () => {
     localStorage.removeItem("selectedStoreId");
@@ -101,7 +102,7 @@ const Sidebar = () => {
         <div className="flex items-center flex-shrink-0">
           <Store className="h-8 w-8 text-white" />
           <span className="ml-2 text-white text-lg font-semibold">
-            POS System
+            Irego POS System
           </span>
         </div>
       </div>
@@ -202,25 +203,33 @@ const Sidebar = () => {
     <>
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-20 w-64 min-w-[10px] bg-primary overflow-y-auto transition-all duration-300 transform ${
-          isOpen ? "translate-x-0" : "-translate-x-[calc(100%-10px)]"
-        }`}
+        className={`fixed inset-y-0 left-0 z-20 w-64 bg-primary overflow-y-auto transition-all duration-300 transform ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        } ${isMobile ? "shadow-lg" : ""}`}
       >
         {sidebarContent}
       </div>
 
+      {/* Overlay */}
+      {isMobile && isOpen && (
+        <div
+          className="fixed inset-0 z-10 bg-black bg-opacity-50"
+          onClick={() => setIsOpen(false)}
+        ></div>
+      )}
+
       {/* Toggle button */}
       <button
         onClick={toggle}
-        className={`fixed top-1/2 -translate-y-1/2 z-40 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center transition-all duration-300 ${
-          isOpen ? "left-60" : "-left-1"
-        } hover:bg-primary-hover`}
+        className={`fixed top-4 z-30 p-2 rounded-md bg-primary text-white transition-all duration-300 ${
+          isOpen ? "left-64" : "left-4"
+        } ${isMobile ? "" : "md:hidden"}`}
         aria-label={isOpen ? "Close sidebar" : "Open sidebar"}
       >
         {isOpen ? (
-          <ChevronLeft className="h-5 w-5" />
+          <ChevronLeft className="h-6 w-6" />
         ) : (
-          <ChevronRight className="h-5 w-5" />
+          <ChevronRight className="h-6 w-6" />
         )}
       </button>
     </>

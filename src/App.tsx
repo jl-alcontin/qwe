@@ -9,6 +9,7 @@ import {
 import { useSelector } from "react-redux";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import StaffLogin from "./components/auth/StaffLogin";
 import Register from "./pages/Register";
@@ -27,6 +28,7 @@ import Settings from "./pages/Settings";
 import Subscription from "./pages/Subscription";
 import { RootState } from "./store";
 import { PERMISSIONS } from "./utils/permissions";
+import NotFound from "./pages/NotFound";
 
 function App() {
   const { token, staff } = useSelector((state: RootState) => state.auth);
@@ -45,6 +47,7 @@ function App() {
 
   return (
     <Routes>
+      <Route index path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/staff/login" element={<StaffLogin />} />
       <Route path="/register" element={<Register />} />
@@ -158,6 +161,7 @@ function App() {
           />
         </Route>
       </Route>
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }
