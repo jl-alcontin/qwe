@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Check, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import {
@@ -14,8 +14,23 @@ const SubscriptionPage = () => {
   const { data: currentSubscription } = useGetCurrentSubscriptionQuery();
   const [subscribe] = useSubscribeMutation();
   const navigate = useNavigate();
+  const location = useLocation();
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+
+  // Handle payment status from URL parameters
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const status = params.get('status');
+    
+    if (status === 'success') {
+      toast.success('Payment successful!');
+      navigate('/subscription', { replace: true });
+    } else if (status === 'failed') {
+      toast.error('Payment failed. Please try again.');
+      navigate('/subscription', { replace: true });
+    }
+  }, [location, navigate]);
 
   const handleSubscribe = async (subscription: any) => {
     if (currentSubscription?.subscription._id === subscription._id) {
