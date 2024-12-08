@@ -121,7 +121,7 @@ router.delete("/:id", protect, async (req, res) => {
         .json({ message: "Not authorized to delete this store" });
     }
 
-    await store.remove();
+    await store.deleteOne();
     res.json({ message: "Store removed" });
   } catch (error) {
     res.status(400).json({ message: error.message });

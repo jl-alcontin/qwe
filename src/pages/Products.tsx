@@ -9,12 +9,17 @@ import {
   useUpdateProductMutation,
   useDeleteProductMutation,
 } from "../store/services/productService";
+import { useGetCurrentSubscriptionQuery } from "../store/services/subscriptionService";
+import { checkSubscriptionLimit } from "../utils/subscriptionLimits";
 import ProductForm from "../components/products/ProductForm";
+import UpgradeModal from "../components/subscription/UpgradeModal";
+
 
 const Products = () => {
   const { storeId } = useParams<{ storeId: string }>();
   const { data: products, isLoading } = useGetProductsQuery(storeId!);
   const { data: categories } = useGetCategoriesQuery(storeId!);
+  const { data: subscription } = useGetCurrentSubscriptionQuery();
   const [createProduct] = useCreateProductMutation();
   const [updateProduct] = useUpdateProductMutation();
   const [deleteProduct] = useDeleteProductMutation();
@@ -22,13 +27,13 @@ const Products = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [modifiers, setModifiers] = useState<any[]>([]);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const resetForm = () => {
     setEditingProduct(null);
     setModifiers([]);
     setIsModalOpen(false);
   };
-
   const handleAddModifier = () => {
     setModifiers([
       ...modifiers,
@@ -92,6 +97,22 @@ const Products = () => {
     setModifiers(newModifiers);
   };
 
+  const handleAddProduct = () => {
+    const canAddProduct = checkSubscriptionLimit(
+      subscription,
+      "maxProducts",
+      products?.length || 0
+    );
+
+    if (!canAddProduct) {
+      setShowUpgradeModal(true);
+      return;
+    }
+
+    resetForm();
+    setIsModalOpen(true);
+  };
+
   const onSubmit = async (data: any) => {
     try {
       const productData = {
@@ -146,10 +167,7 @@ const Products = () => {
             Products
           </h1>
           <button
-            onClick={() => {
-              resetForm();
-              setIsModalOpen(true);
-            }}
+            onClick={handleAddProduct}
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-hover"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -229,6 +247,13 @@ const Products = () => {
             />
           </div>
         </div>
+      )}
+
+      {showUpgradeModal && (
+        <UpgradeModal
+          feature="products"
+          onClose={() => setShowUpgradeModal(false)}
+        />
       )}
     </>
   );

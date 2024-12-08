@@ -15,6 +15,9 @@ import {
   useUpdateStaffMutation,
   useDeleteStaffMutation,
 } from "../store/services/staffService";
+import { useGetCurrentSubscriptionQuery } from "../store/services/subscriptionService";
+import { checkSubscriptionLimit } from "../utils/subscriptionLimits";
+import UpgradeModal from "../components/subscription/UpgradeModal";
 
 interface RoleForm {
   name: string;
@@ -54,6 +57,7 @@ const UserManagement = () => {
   const { storeId } = useParams<{ storeId: string }>();
   const { data: roles } = useGetRolesQuery(storeId!);
   const { data: staff } = useGetStaffQuery(storeId!);
+  const { data: subscription } = useGetCurrentSubscriptionQuery();
   const [createRole] = useCreateRoleMutation();
   const [updateRole] = useUpdateRoleMutation();
   const [deleteRole] = useDeleteRoleMutation();
@@ -63,6 +67,7 @@ const UserManagement = () => {
 
   const [showRoleModal, setShowRoleModal] = useState(false);
   const [showStaffModal, setShowStaffModal] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [editingRole, setEditingRole] = useState<any>(null);
   const [editingStaff, setEditingStaff] = useState<any>(null);
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
@@ -78,6 +83,22 @@ const UserManagement = () => {
     reset: resetStaff,
   } = useForm<StaffForm>();
 
+  const handleAddStaff = () => {
+    const canAddStaff = checkSubscriptionLimit(
+      subscription,
+      'maxStaff',
+      staff?.length || 0
+    );
+
+    if (!canAddStaff) {
+      setShowUpgradeModal(true);
+      return;
+    }
+
+    setEditingStaff(null);
+    resetStaff();
+    setShowStaffModal(true);
+  };
   const onRoleSubmit = async (data: RoleForm) => {
     try {
       const roleData = {
@@ -236,11 +257,7 @@ const UserManagement = () => {
               Staff Members
             </h2>
             <button
-              onClick={() => {
-                setEditingStaff(null);
-                resetStaff();
-                setShowStaffModal(true);
-              }}
+              onClick={handleAddStaff}
               className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-hover"
             >
               <Plus className="h-4 w-4 mr-2" />
