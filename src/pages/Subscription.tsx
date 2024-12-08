@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
@@ -7,20 +7,32 @@ import {
   useGetCurrentSubscriptionQuery,
   useSubscribeMutation
 } from '../store/services/subscriptionService';
+import PaymentModal from '../components/subscription/PaymentModal';
 
 const SubscriptionPage = () => {
   const { data: subscriptions } = useGetSubscriptionsQuery();
   const { data: currentSubscription } = useGetCurrentSubscriptionQuery();
   const [subscribe] = useSubscribeMutation();
   const navigate = useNavigate();
+  const [selectedPlan, setSelectedPlan] = useState<any>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
-  const handleSubscribe = async (subscriptionId: string) => {
+  const handleSubscribe = async (subscription: any) => {
+    if (currentSubscription?.subscription._id === subscription._id) {
+      return;
+    }
+    setSelectedPlan(subscription);
+    setShowPaymentModal(true);
+  };
+
+  const handlePaymentSuccess = async () => {
     try {
       await subscribe({
-        subscriptionId,
+        subscriptionId: selectedPlan._id,
         paymentMethod: 'card'
       }).unwrap();
       toast.success('Successfully subscribed!');
+      setShowPaymentModal(false);
       navigate('/dashboard');
     } catch (error) {
       toast.error('Failed to subscribe');
@@ -77,7 +89,7 @@ const SubscriptionPage = () => {
                     </span>
                   </p>
                   <button
-                    onClick={() => handleSubscribe(subscription._id)}
+                    onClick={() => handleSubscribe(subscription)}
                     disabled={isCurrentPlan}
                     className={`mt-8 block w-full py-2 px-4 border border-transparent rounded-md text-white text-center font-medium ${
                       isCurrentPlan
@@ -108,6 +120,16 @@ const SubscriptionPage = () => {
           })}
         </div>
       </div>
+
+      {showPaymentModal && (
+        <PaymentModal
+          isOpen={showPaymentModal}
+          onClose={() => setShowPaymentModal(false)}
+          subscriptionId={selectedPlan._id}
+          amount={selectedPlan.price}
+          onSuccess={handlePaymentSuccess}
+        />
+      )}
     </div>
   );
 };
