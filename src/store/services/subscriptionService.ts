@@ -54,6 +54,32 @@ export const subscriptionApi = api.injectEndpoints({
         body: data,
       }),
       invalidatesTags: ['CurrentSubscription'],
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          // Force refetch current subscription after successful subscription
+          await dispatch(subscriptionApi.endpoints.getCurrentSubscription.initiate(undefined, { forceRefetch: true }));
+        } catch (error) {
+          console.error('Error updating subscription:', error);
+        }
+      },
+    }),
+    verifySubscription: builder.mutation<UserSubscription, { paymentId: string }>({
+      query: (data) => ({
+        url: 'subscriptions/verify',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['CurrentSubscription'],
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          // Force refetch current subscription after verification
+          await dispatch(subscriptionApi.endpoints.getCurrentSubscription.initiate(undefined, { forceRefetch: true }));
+        } catch (error) {
+          console.error('Error verifying subscription:', error);
+        }
+      },
     }),
     cancelSubscription: builder.mutation<void, void>({
       query: () => ({
@@ -69,5 +95,6 @@ export const {
   useGetSubscriptionsQuery,
   useGetCurrentSubscriptionQuery,
   useSubscribeMutation,
+  useVerifySubscriptionMutation,
   useCancelSubscriptionMutation,
 } = subscriptionApi;

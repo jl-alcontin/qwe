@@ -5,14 +5,16 @@ import { toast } from 'react-hot-toast';
 import {
   useGetSubscriptionsQuery,
   useGetCurrentSubscriptionQuery,
-  useSubscribeMutation
+  useSubscribeMutation,
+  useVerifySubscriptionMutation
 } from '../store/services/subscriptionService';
 import PaymentModal from '../components/subscription/PaymentModal';
 
 const SubscriptionPage = () => {
   const { data: subscriptions } = useGetSubscriptionsQuery();
-  const { data: currentSubscription } = useGetCurrentSubscriptionQuery();
+  const { data: currentSubscription, refetch: refetchCurrentSubscription } = useGetCurrentSubscriptionQuery();
   const [subscribe] = useSubscribeMutation();
+  const [verifySubscription] = useVerifySubscriptionMutation();
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
@@ -22,15 +24,27 @@ const SubscriptionPage = () => {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const status = params.get('status');
+    const paymentId = params.get('payment_id');
     
-    if (status === 'success') {
-      toast.success('Payment successful!');
-      navigate('/subscription', { replace: true });
+    if (status === 'success' && paymentId) {
+      handlePaymentVerification(paymentId);
     } else if (status === 'failed') {
       toast.error('Payment failed. Please try again.');
       navigate('/subscription', { replace: true });
     }
   }, [location, navigate]);
+
+  const handlePaymentVerification = async (paymentId: string) => {
+    try {
+      await verifySubscription({ paymentId }).unwrap();
+      await refetchCurrentSubscription();
+      toast.success('Payment successful!');
+      navigate('/subscription', { replace: true });
+    } catch (error) {
+      toast.error('Failed to verify payment. Please contact support.');
+      navigate('/subscription', { replace: true });
+    }
+  };
 
   const handleSubscribe = async (subscription: any) => {
     if (currentSubscription?.subscription._id === subscription._id) {
@@ -42,15 +56,11 @@ const SubscriptionPage = () => {
 
   const handlePaymentSuccess = async () => {
     try {
-      await subscribe({
-        subscriptionId: selectedPlan._id,
-        paymentMethod: 'card'
-      }).unwrap();
-      toast.success('Successfully subscribed!');
+      await refetchCurrentSubscription();
       setShowPaymentModal(false);
       navigate('/dashboard');
     } catch (error) {
-      toast.error('Failed to subscribe');
+      toast.error('Failed to update subscription status');
     }
   };
 

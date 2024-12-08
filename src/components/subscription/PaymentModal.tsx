@@ -4,7 +4,7 @@ import PaymentMethodSelector from './PaymentMethodSelector';
 import CardPaymentForm from './CardPaymentForm';
 import EWalletPayment from './EwalletPayment';
 import { toast } from 'react-hot-toast';
-import { useSubscribeMutation } from '../../store/services/subscriptionService';
+import { useSubscribeMutation, useVerifySubscriptionMutation } from '../../store/services/subscriptionService';
 import { useNavigate } from 'react-router-dom';
 
 interface PaymentModalProps {
@@ -24,12 +24,19 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
 }) => {
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [subscribe] = useSubscribeMutation();
+  const [verifySubscription] = useVerifySubscriptionMutation();
   const navigate = useNavigate();
 
   if (!isOpen) return null;
 
   const handlePaymentSuccess = async (paymentId?: string) => {
     try {
+      // First verify the payment
+      if (paymentId) {
+        await verifySubscription({ paymentId }).unwrap();
+      }
+
+      // Then update subscription
       await subscribe({
         subscriptionId,
         paymentMethod: selectedMethod || 'card',

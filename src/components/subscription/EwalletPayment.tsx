@@ -23,11 +23,6 @@ const EWalletPayment: React.FC<EWalletPaymentProps> = ({ type, amount, onSuccess
         const source = await createSource(amount, type);
         setSourceData(source);
         
-        if (source.attributes.redirect.checkout_url) {
-          // Open in the same window to maintain session
-          window.location.href = source.attributes.redirect.checkout_url;
-        }
-
         // Start polling for payment status
         const interval = setInterval(async () => {
           try {
@@ -47,6 +42,11 @@ const EWalletPayment: React.FC<EWalletPaymentProps> = ({ type, amount, onSuccess
         }, 3000);
 
         setPollInterval(interval);
+
+        // Open the checkout URL in a new window
+        if (source.attributes.redirect.checkout_url) {
+          window.open(source.attributes.redirect.checkout_url, '_blank');
+        }
       } catch (error: any) {
         onError(error.message || 'Failed to initialize payment');
       } finally {
@@ -89,7 +89,7 @@ const EWalletPayment: React.FC<EWalletPaymentProps> = ({ type, amount, onSuccess
             <div>
               <p className="text-sm text-blue-700 font-medium">Development Mode</p>
               <p className="text-sm text-blue-600 mt-1">
-                You'll be redirected to PayMongo's test payment page. Click "Authorize Test Payment" to simulate a successful payment.
+                A new window will open with PayMongo's test payment page. Complete the payment there and return to this window.
               </p>
             </div>
           </div>
@@ -103,22 +103,19 @@ const EWalletPayment: React.FC<EWalletPaymentProps> = ({ type, amount, onSuccess
       <div className="space-y-2">
         <p className="text-lg font-medium">Amount: ₱{amount.toFixed(2)}</p>
         <p className="text-gray-600">
-          {isDevelopment 
-            ? 'Click the button below to proceed to the test payment page'
-            : 'Scan the QR code or click the button below to complete your payment'
-          }
+          Scan the QR code or click the button below to complete your payment
         </p>
       </div>
 
-      <a
-        href={sourceData.attributes.redirect.checkout_url}
+      <button
+        onClick={() => window.open(sourceData.attributes.redirect.checkout_url, '_blank')}
         className="inline-block py-2 px-4 bg-primary text-white rounded-md hover:bg-primary-hover transition-colors"
       >
-        {isDevelopment ? 'Go to Test Payment Page' : 'Open Payment Page'}
-      </a>
+        Open Payment Page
+      </button>
 
       <p className="text-sm text-gray-500">
-        Don't close this window. It will automatically update once payment is complete.
+        Keep this window open. Your subscription will automatically update once payment is complete.
       </p>
     </div>
   );
