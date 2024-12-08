@@ -7,7 +7,7 @@ import { AlertCircle } from 'lucide-react';
 interface EWalletPaymentProps {
   type: 'gcash' | 'grab_pay' | 'paymaya';
   amount: number;
-  onSuccess: () => void;
+  onSuccess: (sourceId: string) => void;
   onError: (error: string) => void;
 }
 
@@ -35,7 +35,7 @@ const EWalletPayment: React.FC<EWalletPaymentProps> = ({ type, amount, onSuccess
             if (status.attributes.status === 'chargeable') {
               clearInterval(interval);
               toast.success('Payment successful!');
-              onSuccess();
+              onSuccess(source.id); // Pass the source ID to handle subscription update
             } else if (status.attributes.status === 'expired' || status.attributes.status === 'cancelled') {
               clearInterval(interval);
               toast.error('Payment failed or expired');

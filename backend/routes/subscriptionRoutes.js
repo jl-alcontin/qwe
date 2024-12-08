@@ -31,12 +31,12 @@ router.get('/current', protect, async (req, res) => {
 // Subscribe to a plan
 router.post('/subscribe', protect, async (req, res) => {
   try {
-    const { subscriptionId, paymentMethod } = req.body;
+    const { subscriptionId, paymentMethod, paymentDetails } = req.body;
 
     // Cancel any existing active subscription
     await UserSubscription.updateMany(
       { user: req.user._id, status: 'active' },
-      { status: 'cancelled' }
+      { status: 'cancelled', autoRenew: false }
     );
 
     const subscription = await Subscription.findById(subscriptionId);
@@ -44,6 +44,7 @@ router.post('/subscribe', protect, async (req, res) => {
       return res.status(404).json({ message: 'Subscription plan not found' });
     }
 
+    // For free tier or after successful payment
     const endDate = new Date();
     endDate.setMonth(endDate.getMonth() + (subscription.billingCycle === 'yearly' ? 12 : 1));
 
@@ -54,11 +55,16 @@ router.post('/subscribe', protect, async (req, res) => {
       startDate: new Date(),
       endDate,
       paymentMethod,
+      paymentDetails,
       autoRenew: true
     });
 
-    res.status(201).json(await userSubscription.populate('subscription'));
+    const populatedSubscription = await UserSubscription.findById(userSubscription._id)
+      .populate('subscription');
+
+    res.status(201).json(populatedSubscription);
   } catch (error) {
+    console.error('Subscription error:', error);
     res.status(400).json({ message: error.message });
   }
 });

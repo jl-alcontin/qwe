@@ -4,6 +4,8 @@ import PaymentMethodSelector from './PaymentMethodSelector';
 import CardPaymentForm from './CardPaymentForm';
 import EWalletPayment from './EwalletPayment';
 import { toast } from 'react-hot-toast';
+import { useSubscribeMutation } from '../../store/services/subscriptionService';
+import { useNavigate } from 'react-router-dom';
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -21,12 +23,30 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
   onSuccess,
 }) => {
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
+  const [subscribe] = useSubscribeMutation();
+  const navigate = useNavigate();
 
   if (!isOpen) return null;
 
-  const handlePaymentSuccess = (paymentIntentId?: string) => {
-    toast.success('Payment successful!');
-    onSuccess();
+  const handlePaymentSuccess = async (paymentId?: string) => {
+    try {
+      await subscribe({
+        subscriptionId,
+        paymentMethod: selectedMethod || 'card',
+        paymentDetails: { 
+          paymentId,
+          amount,
+          status: 'completed'
+        }
+      }).unwrap();
+      
+      toast.success('Subscription updated successfully!');
+      onSuccess();
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Subscription error:', error);
+      toast.error('Failed to update subscription. Please contact support.');
+    }
   };
 
   const handlePaymentError = (error: string) => {

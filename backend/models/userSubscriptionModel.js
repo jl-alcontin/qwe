@@ -31,7 +31,7 @@ const userSubscriptionSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    enum: ['card', 'paypal']
+    enum: ['card', 'paypal','free','ewallet']
   },
   paymentDetails: {
     type: mongoose.Schema.Types.Mixed

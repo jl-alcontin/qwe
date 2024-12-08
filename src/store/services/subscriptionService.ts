@@ -19,6 +19,22 @@ export interface UserSubscription {
   startDate: string;
   endDate: string;
   autoRenew: boolean;
+  paymentMethod: string;
+  paymentDetails?: {
+    paymentId?: string;
+    amount?: number;
+    status?: string;
+  };
+}
+
+export interface SubscribeRequest {
+  subscriptionId: string;
+  paymentMethod: string;
+  paymentDetails?: {
+    paymentId?: string;
+    amount?: number;
+    status?: string;
+  };
 }
 
 export const subscriptionApi = api.injectEndpoints({
@@ -31,7 +47,7 @@ export const subscriptionApi = api.injectEndpoints({
       query: () => 'subscriptions/current',
       providesTags: ['CurrentSubscription'],
     }),
-    subscribe: builder.mutation<UserSubscription, { subscriptionId: string; paymentMethod: string }>({
+    subscribe: builder.mutation<UserSubscription, SubscribeRequest>({
       query: (data) => ({
         url: 'subscriptions/subscribe',
         method: 'POST',

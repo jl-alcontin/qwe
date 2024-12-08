@@ -1,5 +1,6 @@
 import { api } from '../api';
 import { createNotification, getWelcomeMessage } from '../../utils/notification';
+import { subscriptionApi } from './subscriptionService';
 
 export interface LoginRequest {
   email: string;
@@ -34,6 +35,36 @@ export const authApi = api.injectEndpoints({
         method: 'POST',
         body: userData,
       }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data: user } = await queryFulfilled;
+          
+          // Get free tier subscription
+          const { data: subscriptions } = await dispatch(
+            subscriptionApi.endpoints.getSubscriptions.initiate()
+          );
+          
+          const freeTier = subscriptions?.find(sub => sub.name === 'free');
+          
+          if (freeTier) {
+            // Subscribe user to free tier
+            await dispatch(
+              subscriptionApi.endpoints.subscribe.initiate({
+                subscriptionId: freeTier._id,
+                paymentMethod: 'free'
+              })
+            );
+          }
+
+          // Create welcome notification
+          await createNotification(
+            dispatch,
+            getWelcomeMessage(user.name)
+          );
+        } catch (error) {
+          console.error('Error in register:', error);
+        }
+      }
     }),
     getProfile: builder.query<Omit<User, 'token'>, void>({
       query: () => 'auth/profile',
