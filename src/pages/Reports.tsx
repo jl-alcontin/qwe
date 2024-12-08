@@ -1,73 +1,96 @@
 import React, { useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { 
-  BarChart2, 
-  DollarSign, 
-  ShoppingBag, 
-  TrendingUp,
-  Download
-} from 'lucide-react';
-import { format, parseISO, startOfDay, endOfDay, isWithinInterval } from 'date-fns';
+import { BarChart2, Download } from 'lucide-react';
+import { format, subDays, parseISO } from 'date-fns';
 import { utils, writeFile } from 'xlsx';
 import { useGetSalesQuery } from '../store/services/saleService';
-import SalesChart from '../components/reports/SalesChart';
-import ReportCard from '../components/reports/ReportCard';
 import DateRangePicker from '../components/reports/DateRangePicker';
+import SalesChart from '../components/reports/SalesChart';
+import SalesMetricsCards from '../components/reports/SalesMetricCards';
+import TopProductsTable from '../components/reports/TopProductTable';
+import PaymentMethodChart from '../components/reports/PaymentMethodChart';
+import { 
+  calculateSalesMetrics, 
+  generateDailySalesData,
+  generateHourlyData 
+} from '../utils/report';
 
 const Reports = () => {
   const { storeId } = useParams<{ storeId: string }>();
   const { data: sales } = useGetSalesQuery(storeId!);
   const [startDate, setStartDate] = useState(
-    format(new Date().setDate(new Date().getDate() - 30), 'yyyy-MM-dd')
+    format(subDays(new Date(), 30), 'yyyy-MM-dd')
   );
   const [endDate, setEndDate] = useState(format(new Date(), 'yyyy-MM-dd'));
 
-  const filteredSales = useMemo(() => {
-    if (!sales) return [];
-    
-    return sales.filter((sale) => {
-      const saleDate = parseISO(sale.createdAt);
-      return isWithinInterval(saleDate, {
-        start: startOfDay(parseISO(startDate)),
-        end: endOfDay(parseISO(endDate)),
-      });
-    });
-  }, [sales, startDate, endDate]);
+  const {
+    currentPeriodSales,
+    previousPeriodSales,
+    currentMetrics,
+    previousMetrics,
+    dailyData,
+    hourlyData,
+    paymentMethodData
+  } = useMemo(() => {
+    if (!sales) return {
+      currentPeriodSales: [],
+      previousPeriodSales: [],
+      currentMetrics: null,
+      previousMetrics: null,
+      dailyData: [],
+      hourlyData: [],
+      paymentMethodData: []
+    };
 
-  const metrics = useMemo(() => {
-    const totalSales = filteredSales.reduce((sum, sale) => sum + sale.total, 0);
-    const totalOrders = filteredSales.length;
-    const averageOrderValue = totalOrders > 0 ? totalSales / totalOrders : 0;
+    const currentStart = parseISO(startDate);
+    const currentEnd = parseISO(endDate);
+    const previousStart = subDays(currentStart, 30);
+    const previousEnd = subDays(currentEnd, 30);
+
+    const currentPeriodSales = sales.filter(sale => {
+      const date = new Date(sale.createdAt);
+      return date >= currentStart && date <= currentEnd;
+    });
+
+    const previousPeriodSales = sales.filter(sale => {
+      const date = new Date(sale.createdAt);
+      return date >= previousStart && date <= previousEnd;
+    });
+
+    const currentMetrics = calculateSalesMetrics(currentPeriodSales);
+    const previousMetrics = calculateSalesMetrics(previousPeriodSales);
+    const dailyData = generateDailySalesData(currentPeriodSales, currentStart, currentEnd);
+    const hourlyData = generateHourlyData(currentPeriodSales);
+
+    const paymentMethodData = Object.entries(currentMetrics.paymentMethodBreakdown)
+      .map(([name, data]) => ({
+        name: name.charAt(0).toUpperCase() + name.slice(1),
+        value: data.total
+      }));
 
     return {
-      totalSales,
-      totalOrders,
-      averageOrderValue,
+      currentPeriodSales,
+      previousPeriodSales,
+      currentMetrics,
+      previousMetrics,
+      dailyData,
+      hourlyData,
+      paymentMethodData
     };
-  }, [filteredSales]);
-
-  const chartData = useMemo(() => {
-    const dailySales = filteredSales.reduce((acc: any, sale) => {
-      const date = format(parseISO(sale.createdAt), 'MMM dd');
-      acc[date] = (acc[date] || 0) + sale.total;
-      return acc;
-    }, {});
-
-    return Object.entries(dailySales).map(([name, sales]) => ({
-      name,
-      sales,
-    }));
-  }, [filteredSales]);
+  }, [sales, startDate, endDate]);
 
   const exportToExcel = () => {
-    const data = filteredSales.map((sale) => ({
-      'Date': format(parseISO(sale.createdAt), 'yyyy-MM-dd HH:mm:ss'),
+    if (!currentPeriodSales) return;
+
+    const data = currentPeriodSales.map(sale => ({
+      'Date': format(new Date(sale.createdAt), 'yyyy-MM-dd HH:mm:ss'),
       'Order ID': sale._id,
-      'Payment Method': sale.paymentMethod,
       'Total': sale.total,
-      'Items': sale.items.map(item => 
-        `${item.product.name} (x${item.quantity})`
-      ).join(', '),
+      'Payment Method': sale.paymentMethod,
+      'Items': sale.items
+        .map(item => `${item.product?.name || 'Unknown'} (x${item.quantity})`)
+        .join(', '),
+      'Status': sale.status
     }));
 
     const ws = utils.json_to_sheet(data);
@@ -76,12 +99,16 @@ const Reports = () => {
     writeFile(wb, `sales-report-${startDate}-to-${endDate}.xlsx`);
   };
 
+  if (!currentMetrics || !previousMetrics) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
           <BarChart2 className="h-6 w-6" />
-          Reports
+          Advanced Reports
         </h1>
         <button
           onClick={exportToExcel}
@@ -99,28 +126,21 @@ const Reports = () => {
         onEndDateChange={setEndDate}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <ReportCard
-          title="Total Sales"
-          value={`$${metrics.totalSales.toFixed(2)}`}
-          icon={DollarSign}
-        />
-        <ReportCard
-          title="Total Orders"
-          value={metrics.totalOrders}
-          icon={ShoppingBag}
-        />
-        <ReportCard
-          title="Average Order Value"
-          value={`$${metrics.averageOrderValue.toFixed(2)}`}
-          icon={TrendingUp}
-        />
+      <SalesMetricsCards
+        currentMetrics={currentMetrics}
+        previousMetrics={previousMetrics}
+      />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-lg font-medium mb-4">Daily Sales Trend</h2>
+          <SalesChart data={dailyData} />
+        </div>
+
+        <PaymentMethodChart data={paymentMethodData} />
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-lg font-medium mb-4">Sales Trend</h2>
-        <SalesChart data={chartData} />
-      </div>
+      <TopProductsTable products={currentMetrics.topProducts} />
     </div>
   );
 };
