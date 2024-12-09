@@ -60,9 +60,9 @@ const authSlice = createSlice({
       localStorage.setItem("user", JSON.stringify(user));
 
       // Set theme preference
-      if (user.themePreference) {
+      if (action.payload.themePreference) {
         const setTheme = useThemeStore.getState().setTheme;
-        setTheme(user.themePreference);
+        setTheme(action.payload.themePreference);
       }
     },
     setStaffCredentials: (

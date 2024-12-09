@@ -50,6 +50,7 @@ router.post('/login', async (req, res) => {
         name: user.name,
         email: user.email,
         token: generateToken(user._id),
+        themePreference: user.themePreference,
       });
     } else {
       res.status(401).json({ message: 'Invalid email or password' });

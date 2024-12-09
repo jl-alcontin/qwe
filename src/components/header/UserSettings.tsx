@@ -53,9 +53,7 @@ const UserSettings = () => {
     }
   };
 
-  const handleThemeChange = async (
-    newTheme: "light" | "dark" | "green" | "indigo"
-  ) => {
+  const handleThemeChange = async (newTheme: "light" | "dark" | "green" | "indigo") => {
     try {
       await updateTheme({ themePreference: newTheme }).unwrap();
       setTheme(newTheme);
