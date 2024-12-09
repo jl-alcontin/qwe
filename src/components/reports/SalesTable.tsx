@@ -7,6 +7,15 @@ interface SalesTableProps {
 }
 
 const SalesTable: React.FC<SalesTableProps> = ({ sales }) => {
+  const formatDiscounts = (sale: Sale) => {
+    const allDiscounts = sale.items.flatMap(item => item.discounts || []);
+    if (allDiscounts.length === 0) return "No discounts";
+
+    return allDiscounts.map(discount => (
+      `${discount.name} (${discount.type === 'percentage' ? `${discount.value}%` : `$${discount.value}`})`
+    )).join(", ");
+  };
+
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <div className="overflow-x-auto">
@@ -21,6 +30,9 @@ const SalesTable: React.FC<SalesTableProps> = ({ sales }) => {
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Payment Method
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Discounts
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
@@ -45,6 +57,9 @@ const SalesTable: React.FC<SalesTableProps> = ({ sales }) => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
                   {sale.paymentMethod}
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-500">
+                  {formatDiscounts(sale)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
