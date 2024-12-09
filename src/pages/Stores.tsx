@@ -118,7 +118,7 @@ const Stores = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
           <Store className="h-6 w-6" />

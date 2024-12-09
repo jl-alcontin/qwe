@@ -22,6 +22,11 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Store'
   }],
+  themePreference: {
+    type: String,
+    enum: ['light', 'dark','green','indigo'],
+    default: 'light'
+  }
 }, {
   timestamps: true,
 });

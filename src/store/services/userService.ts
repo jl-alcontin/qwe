@@ -10,6 +10,10 @@ export interface UpdatePasswordRequest {
   newPassword: string;
 }
 
+export interface UpdateThemeRequest {
+  themePreference: "light" | "dark" | "green" | "indigo";
+}
+
 export const userApi = api.injectEndpoints({
   endpoints: (builder) => ({
     updateProfile: builder.mutation<any, UpdateProfileRequest>({
@@ -26,6 +30,13 @@ export const userApi = api.injectEndpoints({
         body: passwordData,
       }),
     }),
+    updateTheme: builder.mutation<void, UpdateThemeRequest>({
+      query: (themeData) => ({
+        url: "users/theme",
+        method: "PUT",
+        body: themeData,
+      }),
+    }),
     deleteAccount: builder.mutation<void, void>({
       query: () => ({
         url: "users/account",
@@ -38,5 +49,6 @@ export const userApi = api.injectEndpoints({
 export const {
   useUpdateProfileMutation,
   useUpdatePasswordMutation,
+  useUpdateThemeMutation,
   useDeleteAccountMutation,
 } = userApi;

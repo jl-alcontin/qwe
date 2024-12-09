@@ -66,6 +66,22 @@ router.put("/profile", protect, async (req, res) => {
 //   }
 // });
 
+//Update theme
+router.put("/theme", protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (user) {
+      user.themePreference = req.body.themePreference;
+      await user.save();
+      res.json({ message: "Theme updated successfully" });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
 // Update password
 router.put("/password", protect, async (req, res) => {
   try {

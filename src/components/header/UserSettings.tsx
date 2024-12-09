@@ -1,10 +1,19 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Settings, Moon, Sun, Lock, Trash2, Leaf, Sparkles } from 'lucide-react';
+import {
+  Settings,
+  Moon,
+  Sun,
+  Lock,
+  Trash2,
+  Leaf,
+  Sparkles,
+} from "lucide-react";
 import {
   useUpdatePasswordMutation,
   useDeleteAccountMutation,
+  useUpdateThemeMutation,
 } from "../../store/services/userService";
 import { useTheme } from "../../utils/theme";
 import { useDispatch } from "react-redux";
@@ -21,8 +30,10 @@ interface PasswordForm {
 const UserSettings = () => {
   const { theme, setTheme } = useTheme();
   const [updatePassword] = useUpdatePasswordMutation();
+  const [updateTheme] = useUpdateThemeMutation();
   const [deleteAccount] = useDeleteAccountMutation();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isThemeLoading, setIsThemeLoading] = useState(false); // Added loading state
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -51,6 +62,21 @@ const UserSettings = () => {
     }
   };
 
+  const handleThemeChange = async (
+    newTheme: "light" | "dark" | "green" | "indigo"
+  ) => {
+    setIsThemeLoading(true); // Added loading state
+    try {
+      await updateTheme({ themePreference: newTheme }).unwrap();
+      setTheme(newTheme);
+      toast.success("Theme updated successfully");
+    } catch (error) {
+      toast.error("Failed to update theme");
+    } finally {
+      setIsThemeLoading(false); // Added loading state
+    }
+  };
+
   const handleDeleteAccount = async () => {
     try {
       await deleteAccount().unwrap();
@@ -73,50 +99,35 @@ const UserSettings = () => {
       <div>
         <h2 className="text-lg font-medium mb-4">Theme</h2>
         <div className="flex flex-wrap items-center gap-4">
-          <button
-            onClick={() => setTheme("light")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md ${
-              theme === "light"
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
-            }`}
-          >
-            <Sun className="h-4 w-4" />
-            Light
-          </button>
-          <button
-            onClick={() => setTheme("green")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md ${
-              theme === "green"
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
-            }`}
-          >
-            <Leaf className="h-4 w-4" />
-            Green
-          </button>
-          <button
-            onClick={() => setTheme("indigo")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md ${
-              theme === "indigo"
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
-            }`}
-          >
-            <Sparkles className="h-4 w-4" />
-            Indigo
-          </button>
-          <button
-            onClick={() => setTheme("dark")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md ${
-              theme === "dark"
-                ? "bg-primary text-white"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
-            }`}
-          >
-            <Moon className="h-4 w-4" />
-            Dark
-          </button>
+          {["light", "green", "indigo", "dark"].map((themeOption) => (
+            <button
+              key={themeOption}
+              onClick={() =>
+                handleThemeChange(
+                  themeOption as "light" | "dark" | "green" | "indigo"
+                )
+              }
+              disabled={isThemeLoading}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md ${
+                themeOption === "dark"
+                  ? theme === themeOption
+                    ? "bg-primary text-white"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  : theme === themeOption
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+              } ${isThemeLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+            >
+              {themeOption === "light" && <Sun className="h-4 w-4" />}
+              {themeOption === "green" && <Leaf className="h-4 w-4" />}
+              {themeOption === "indigo" && <Sparkles className="h-4 w-4" />}
+              {themeOption === "dark" && <Moon className="h-4 w-4" />}
+              {themeOption.charAt(0).toUpperCase() + themeOption.slice(1)}
+              {isThemeLoading && theme === themeOption && (
+                <span className="ml-2 animate-spin">⌛</span>
+              )}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -126,10 +137,7 @@ const UserSettings = () => {
           <Lock className="h-5 w-5" />
           Change Password
         </h2>
-        <form
-          onSubmit={handleSubmit(onPasswordSubmit)}
-          className="space-y-4"
-        >
+        <form onSubmit={handleSubmit(onPasswordSubmit)} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Current Password
@@ -228,4 +236,3 @@ const UserSettings = () => {
 };
 
 export default UserSettings;
-
