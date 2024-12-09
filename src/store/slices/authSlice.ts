@@ -59,7 +59,7 @@ const authSlice = createSlice({
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
-      // Apply theme
+      // Set theme preference
       if (user.themePreference) {
         const setTheme = useThemeStore.getState().setTheme;
         setTheme(user.themePreference);

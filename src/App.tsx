@@ -7,6 +7,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { ThemeProvider } from "./components/ThemeProvider";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
@@ -50,128 +51,131 @@ function App() {
   }, [token, staff, navigate, location.pathname]);
 
   return (
-    <Routes>
-      <Route index path="/" element={<LandingPage />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/staff/login" element={<StaffLogin />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/unauthorized" element={<Unauthorized />} />
-      <Route path="/subscription" element={<Subscription />} />
-      <Route path="/faq" element={<FAQ />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/documentation" element={<Documentation />} />
-      <Route path="/About" element={<About />} />
-
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <Layout />
-          </ProtectedRoute>
-        }
-      >
-        <Route
-          index
-          element={
-            staff ? (
-              <Navigate to={`/stores/${staff.store}/dashboard`} replace />
-            ) : (
-              <Stores />
-            )
-          }
-        />
-        <Route
-          path="stores"
-          element={
-            staff ? (
-              <Navigate to={`/stores/${staff.store}/dashboard`} replace />
-            ) : (
-              <Stores />
-            )
-          }
-        />
+    <ThemeProvider>
+      <Routes>
+        <Route index path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/staff/login" element={<StaffLogin />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/unauthorized" element={<Unauthorized />} />
+        <Route path="/subscription" element={<Subscription />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/documentation" element={<Documentation />} />
+        <Route path="/About" element={<About />} />
 
         <Route
-          path="stores/create"
+          path="/"
           element={
-            staff ? (
-              <Navigate to={`/stores/${staff.store}/dashboard`} replace />
-            ) : (
-              <CreateStore />
-            )
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
           }
-        />
-        <Route path="stores/:storeId">
-          <Route path="dashboard" element={<Dashboard />} />
+        >
           <Route
-            path="settings"
+            index
             element={
-              <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_SETTINGS}>
-                <Settings />
-              </ProtectedRoute>
+              staff ? (
+                <Navigate to={`/stores/${staff.store}/dashboard`} replace />
+              ) : (
+                <Stores />
+              )
             }
           />
           <Route
-            path="categories"
+            path="stores"
             element={
-              <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_INVENTORY}>
-                <Categories />
-              </ProtectedRoute>
+              staff ? (
+                <Navigate to={`/stores/${staff.store}/dashboard`} replace />
+              ) : (
+                <Stores />
+              )
             }
           />
+
           <Route
-            path="products"
+            path="stores/create"
             element={
-              <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_INVENTORY}>
-                <Products />
-              </ProtectedRoute>
+              staff ? (
+                <Navigate to={`/stores/${staff.store}/dashboard`} replace />
+              ) : (
+                <CreateStore />
+              )
             }
           />
-          <Route
-            path="inventory"
-            element={
-              <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_INVENTORY}>
-                <Inventory />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="sales"
-            element={
-              <ProtectedRoute requiredPermission={PERMISSIONS.CREATE_SALE}>
-                <Sales />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="discounts"
-            element={
-              <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_INVENTORY}>
-                <Discounts />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="reports"
-            element={
-              <ProtectedRoute requiredPermission={PERMISSIONS.VIEW_REPORTS}>
-                <Reports />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="users"
-            element={
-              <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_USERS}>
-                <UserManagement />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="stores/:storeId">
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route
+              path="settings"
+              element={
+                <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_SETTINGS}>
+                  <Settings />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="categories"
+              element={
+                <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_INVENTORY}>
+                  <Categories />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="products"
+              element={
+                <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_INVENTORY}>
+                  <Products />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="inventory"
+              element={
+                <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_INVENTORY}>
+                  <Inventory />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="sales"
+              element={
+                <ProtectedRoute requiredPermission={PERMISSIONS.CREATE_SALE}>
+                  <Sales />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="discounts"
+              element={
+                <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_INVENTORY}>
+                  <Discounts />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="reports"
+              element={
+                <ProtectedRoute requiredPermission={PERMISSIONS.VIEW_REPORTS}>
+                  <Reports />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="users"
+              element={
+                <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_USERS}>
+                  <UserManagement />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
         </Route>
-      </Route>
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </ThemeProvider>
   );
 }
 
 export default App;
+

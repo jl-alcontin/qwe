@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Settings, Moon, Sun, Lock, Trash2, Leaf, Sparkles } from 'lucide-react';
@@ -6,9 +6,8 @@ import {
   useUpdatePasswordMutation,
   useDeleteAccountMutation,
   useUpdateThemeMutation,
-  useGetUserThemeQuery,
 } from "../../store/services/userService";
-import { useTheme } from "../../utils/theme";
+import { useThemeStore } from "../../store/ui/themeStore";
 import { useDispatch } from "react-redux";
 import { logout } from "../../store/slices/authSlice";
 import { useNavigate } from "react-router-dom";
@@ -21,11 +20,10 @@ interface PasswordForm {
 }
 
 const UserSettings = () => {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme } = useThemeStore();
   const [updatePassword] = useUpdatePasswordMutation();
   const [updateTheme] = useUpdateThemeMutation();
   const [deleteAccount] = useDeleteAccountMutation();
-  const { data: userTheme, isLoading: isThemeLoading } = useGetUserThemeQuery();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -78,12 +76,6 @@ const UserSettings = () => {
     }
   };
 
-  useEffect(() => {
-    if (!isThemeLoading && userTheme) {
-      setTheme(userTheme.themePreference);
-    }
-  }, [isThemeLoading, userTheme, setTheme]);
-
   return (
     <div className="space-y-8">
       <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
@@ -103,7 +95,6 @@ const UserSettings = () => {
                   themeOption as "light" | "dark" | "green" | "indigo"
                 )
               }
-              disabled={isThemeLoading}
               className={`flex items-center gap-2 px-4 py-2 rounded-md ${
                 themeOption === "dark"
                   ? theme === themeOption
@@ -112,16 +103,13 @@ const UserSettings = () => {
                   : theme === themeOption
                   ? "bg-primary text-primary-foreground"
                   : "bg-muted text-muted-foreground hover:bg-muted/80"
-              } ${isThemeLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+              }`}
             >
               {themeOption === "light" && <Sun className="h-4 w-4" />}
               {themeOption === "green" && <Leaf className="h-4 w-4" />}
               {themeOption === "indigo" && <Sparkles className="h-4 w-4" />}
               {themeOption === "dark" && <Moon className="h-4 w-4" />}
               {themeOption.charAt(0).toUpperCase() + themeOption.slice(1)}
-              {isThemeLoading && theme === themeOption && (
-                <span className="ml-2 animate-spin">⌛</span>
-              )}
             </button>
           ))}
         </div>
