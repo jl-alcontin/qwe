@@ -4,43 +4,99 @@ import {
   Store,
   Book,
   FileText,
-  Code,
-  Terminal,
-  Database,
+  ShoppingCart,
+  Package,
+  Users,
+  BarChart2,
+  Tag,
+  Bell,
   Shield,
+  Clock,
+  Smartphone,
+  Cloud,
   Settings,
-  CreditCard,
 } from "lucide-react";
 
 const Documentation = () => {
-  const sections = [
+  const features = [
     {
-      title: "Getting Started",
-      icon: Book,
-      content: [
-        { title: "Introduction", href: "#introduction" },
-        { title: "Quick Start Guide", href: "#quick-start" },
-      ],
+      title: "Sales Management",
+      icon: ShoppingCart,
+      items: [
+        "Process sales with an intuitive POS interface",
+        "Support for multiple payment methods (Cash, Card, QR)",
+        "Apply discounts and modifiers to items",
+        "Quick product search and category filtering",
+        "Real-time stock updates on sales",
+        "Print or email receipts",
+        "View sales history and process refunds"
+      ]
     },
     {
-      title: "Core Features",
-      icon: FileText,
-      content: [
-        { title: "Inventory Management", href: "#inventory" },
-        { title: "Sales Processing", href: "#sales" },
-        { title: "Reports & Analytics", href: "#reports" },
-        { title: "Staff Management", href: "#staff" },
-      ],
+      title: "Inventory Control",
+      icon: Package,
+      items: [
+        "Track product stock levels in real-time",
+        "Set up automatic stock alerts",
+        "Manage product categories and variants",
+        "Add product modifiers and options",
+        "Record stock movements and adjustments",
+        "View stock movement history",
+        "Set reorder points and low stock thresholds"
+      ]
     },
     {
-      title: "Security",
-      icon: Shield,
-      content: [
-        { title: "Authentication", href: "#authentication" },
-        { title: "Permissions", href: "#permissions" },
-        { title: "Data Protection", href: "#data-protection" },
-      ],
+      title: "Staff Management",
+      icon: Users,
+      items: [
+        "Create and manage staff accounts",
+        "Define custom roles and permissions",
+        "Track staff activity and sales performance",
+        "Set up role-based access control",
+        "Monitor staff login history",
+        "Manage staff schedules and shifts",
+        "Control feature access by role"
+      ]
     },
+    {
+      title: "Reports & Analytics",
+      icon: BarChart2,
+      items: [
+        "View daily, weekly, and monthly sales reports",
+        "Track revenue and profit margins",
+        "Analyze sales by payment method",
+        "Monitor top-selling products",
+        "Generate inventory reports",
+        "Export data to Excel",
+        "Custom date range reporting"
+      ]
+    },
+    {
+      title: "Discount Management",
+      icon: Tag,
+      items: [
+        "Create percentage or fixed amount discounts",
+        "Set up time-limited promotions",
+        "Apply discounts to specific products",
+        "Define minimum purchase requirements",
+        "Track discount usage and impact",
+        "Schedule automatic discounts",
+        "Set maximum discount limits"
+      ]
+    },
+    {
+      title: "Multi-store Management",
+      icon: Store,
+      items: [
+        "Manage multiple store locations",
+        "Track inventory across stores",
+        "View per-store sales and reports",
+        "Configure store-specific settings",
+        "Manage staff across locations",
+        "Set store-specific pricing",
+        "Monitor performance by location"
+      ]
+    }
   ];
 
   return (
@@ -71,118 +127,79 @@ const Documentation = () => {
 
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-12 gap-8">
-            {/* Sidebar Navigation */}
-            <div className="col-span-12 md:col-span-3">
-              <div className="bg-white rounded-lg shadow-lg p-6 sticky top-6">
-                <h2 className="text-lg font-semibold mb-4">Documentation</h2>
-                <nav className="space-y-6">
-                  {sections.map((section) => (
-                    <div key={section.title}>
-                      <div className="flex items-center space-x-2 text-gray-900 font-medium mb-2">
-                        <section.icon className="h-5 w-5" />
-                        <span>{section.title}</span>
-                      </div>
-                      <ul className="space-y-2 ml-7">
-                        {section.content.map((item) => (
-                          <li key={item.title}>
-                            <a
-                              href={item.href}
-                              className="text-gray-600 hover:text-primary text-sm"
-                            >
-                              {item.title}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+          <div className="text-center mb-12">
+            <Book className="mx-auto h-12 w-12 text-primary" />
+            <h1 className="mt-4 text-3xl font-bold text-gray-900">
+              POS System Features
+            </h1>
+            <p className="mt-2 text-lg text-gray-600">
+              Comprehensive guide to our point of sale system's features and capabilities
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {features.map((feature, index) => (
+              <div key={index} className="bg-white rounded-lg shadow-lg p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <feature.icon className="h-6 w-6 text-primary" />
+                  <h2 className="text-xl font-semibold">{feature.title}</h2>
+                </div>
+                <ul className="space-y-2">
+                  {feature.items.map((item, itemIndex) => (
+                    <li key={itemIndex} className="flex items-start gap-2">
+                      <div className="min-w-[6px] h-[6px] rounded-full bg-primary mt-2" />
+                      <span className="text-gray-600">{item}</span>
+                    </li>
                   ))}
-                </nav>
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 bg-white rounded-lg shadow-lg p-8">
+            <h2 className="text-2xl font-semibold mb-6">Getting Started</h2>
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-medium mb-2">1. Create Your Account</h3>
+                <p className="text-gray-600">
+                  Sign up for a free account to access basic features. Choose from our
+                  flexible subscription plans as your business grows.
+                </p>
+              </div>
+              
+              <div>
+                <h3 className="text-lg font-medium mb-2">2. Set Up Your Store</h3>
+                <p className="text-gray-600">
+                  Configure your store details, add your products, and customize
+                  settings to match your business needs.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-medium mb-2">3. Add Your Team</h3>
+                <p className="text-gray-600">
+                  Create staff accounts and assign roles with specific permissions
+                  to manage access to different features.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-medium mb-2">4. Start Selling</h3>
+                <p className="text-gray-600">
+                  Begin processing sales, tracking inventory, and growing your
+                  business with our comprehensive POS solution.
+                </p>
               </div>
             </div>
+          </div>
 
-            {/* Main Content */}
-            <div className="col-span-12 md:col-span-9">
-              <div className="bg-white rounded-lg shadow-lg p-8">
-                <section id="introduction" className="mb-12">
-                  <h1 className="text-3xl font-bold mb-6">
-                    IREGO POS Documentation
-                  </h1>
-                  <p className="text-gray-600 mb-4">
-                    Welcome to the comprehensive documentation for IREGO POS
-                    System. This guide will help you understand and utilize all
-                    the features of our point of sale system effectively.
-                  </p>
-                </section>
-
-                <section id="quick-start" className="mb-12">
-                  <h2 className="text-2xl font-semibold mb-4">
-                    Quick Start Guide
-                  </h2>
-                  <div className="prose max-w-none">
-                    <p>Follow these steps to get started with IREGO POS:</p>
-                    <ol className="list-decimal list-inside space-y-2">
-                      <li>
-                        Create an account and choose your subscription plan
-                      </li>
-                      <li>Set up your store profile and preferences</li>
-                      <li>Add your inventory items</li>
-                      <li>Configure user roles and permissions</li>
-                      <li>Start processing sales</li>
-                    </ol>
-                  </div>
-                </section>
-
-                <section id="inventory" className="mb-12">
-                  <h2 className="text-2xl font-semibold mb-4">
-                    Inventory Management
-                  </h2>
-                  <div className="flex items-center mb-4">
-                    <Database className="h-5 w-5 text-primary mr-2" />
-                    <span className="font-medium">Key Features</span>
-                  </div>
-                  <ul className="list-disc list-inside space-y-2 text-gray-600">
-                    <li>Real-time stock tracking</li>
-                    <li>Automatic stock alerts</li>
-                    <li>Batch inventory updates</li>
-                    <li>Category management</li>
-                    <li>Stock movement history</li>
-                  </ul>
-                </section>
-
-                <section id="sales" className="mb-12">
-                  <h2 className="text-2xl font-semibold mb-4">
-                    Sales Processing
-                  </h2>
-                  <div className="flex items-center mb-4">
-                    <CreditCard className="h-5 w-5 text-primary mr-2" />
-                    <span className="font-medium">Payment Methods</span>
-                  </div>
-                  <ul className="list-disc list-inside space-y-2 text-gray-600">
-                    <li>Cash transactions</li>
-                    <li>Credit/Debit cards</li>
-                    <li>QR code payments</li>
-                    <li>Digital wallets</li>
-                  </ul>
-                </section>
-
-                <section id="security" className="mb-12">
-                  <h2 className="text-2xl font-semibold mb-4">
-                    Security Features
-                  </h2>
-                  <div className="flex items-center mb-4">
-                    <Shield className="h-5 w-5 text-primary mr-2" />
-                    <span className="font-medium">Security Measures</span>
-                  </div>
-                  <ul className="list-disc list-inside space-y-2 text-gray-600">
-                    <li>Role-based access control</li>
-                    <li>Two-factor authentication</li>
-                    <li>Encrypted data transmission</li>
-                    <li>Regular security audits</li>
-                  </ul>
-                </section>
-              </div>
-            </div>
+          <div className="mt-12 text-center">
+            <p className="text-gray-600">
+              Need help getting started?{" "}
+              <Link to="/contact" className="text-primary hover:text-primary-hover">
+                Contact our support team
+              </Link>
+            </p>
           </div>
         </div>
       </div>

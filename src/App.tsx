@@ -32,6 +32,7 @@ import Documentation from "./pages/Documentation";
 import { RootState } from "./store";
 import { PERMISSIONS } from "./utils/permissions";
 import NotFound from "./pages/NotFound";
+import About from "./pages/About";
 
 function App() {
   const { token, staff } = useSelector((state: RootState) => state.auth);
@@ -59,6 +60,7 @@ function App() {
       <Route path="/faq" element={<FAQ />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/documentation" element={<Documentation />} />
+      <Route path="/About" element={<About />} />
 
       <Route
         path="/"

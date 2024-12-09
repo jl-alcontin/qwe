@@ -35,14 +35,14 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Product</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/features" className="text-gray-400 hover:text-white">
+                <a href="#features" className="text-gray-400 hover:text-white">
                   Features
-                </Link>
+                </a>
               </li>
               <li>
-                <Link to="/pricing" className="text-gray-400 hover:text-white">
+                <a href="#pricing" className="text-gray-400 hover:text-white">
                   Pricing
-                </Link>
+                </a>
               </li>
               <li>
                 <Link to="/integrations" className="text-gray-400 hover:text-white">
@@ -56,8 +56,8 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Support</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/help" className="text-gray-400 hover:text-white">
-                  Help Center
+                <Link to="/faq" className="text-gray-400 hover:text-white">
+                  FAQ
                 </Link>
               </li>
               <li>
