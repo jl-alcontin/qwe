@@ -6,6 +6,7 @@ interface User {
   _id: string;
   name: string;
   email: string;
+  theme?: string;
 }
 
 interface AuthState {
@@ -41,7 +42,7 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (
       state,
-      action: PayloadAction<{ token: string; _id: string; name: string; email: string }>
+      action: PayloadAction<{ token: string; _id: string; name: string; email: string; theme?: string }>
     ) => {
       localStorage.clear();
       const { token, ...user } = action.payload;
@@ -63,6 +64,15 @@ const authSlice = createSlice({
       localStorage.setItem('token', token);
       localStorage.setItem('staff', JSON.stringify(staff));
     },
+    updateUserTheme: (
+      state,
+      action: PayloadAction<string>
+    ) => {
+      if (state.user) {
+        state.user.theme = action.payload;
+        localStorage.setItem('user', JSON.stringify(state.user));
+      }
+    },
     logout: (state) => {
       state.token = null;
       state.user = null;
@@ -75,5 +85,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setCredentials, setStaffCredentials, logout } = authSlice.actions;
+export const { setCredentials, setStaffCredentials, updateUserTheme, logout } = authSlice.actions;
 export default authSlice.reducer;

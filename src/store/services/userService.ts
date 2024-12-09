@@ -3,11 +3,16 @@ import { api } from "../api";
 export interface UpdateProfileRequest {
   name: string;
   email: string;
+  theme?: string;
 }
 
 export interface UpdatePasswordRequest {
   currentPassword: string;
   newPassword: string;
+}
+
+export interface UpdateThemeRequest {
+  theme: string;
 }
 
 export const userApi = api.injectEndpoints({
@@ -17,6 +22,13 @@ export const userApi = api.injectEndpoints({
         url: "users/profile",
         method: "PUT",
         body: userData,
+      }),
+    }),
+    updateTheme: builder.mutation<{ theme: string }, UpdateThemeRequest>({
+      query: (themeData) => ({
+        url: "users/theme",
+        method: "PUT",
+        body: themeData,
       }),
     }),
     updatePassword: builder.mutation<void, UpdatePasswordRequest>({
@@ -37,6 +49,7 @@ export const userApi = api.injectEndpoints({
 
 export const {
   useUpdateProfileMutation,
+  useUpdateThemeMutation,
   useUpdatePasswordMutation,
   useDeleteAccountMutation,
 } = userApi;
