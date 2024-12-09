@@ -27,6 +27,8 @@ import Unauthorized from "./pages/Unauthorized";
 import Settings from "./pages/Settings";
 import Subscription from "./pages/Subscription";
 import FAQ from "./pages/FAQ";
+import Contact from "./pages/Contact";
+import Documentation from "./pages/Documentation";
 import { RootState } from "./store";
 import { PERMISSIONS } from "./utils/permissions";
 import NotFound from "./pages/NotFound";
@@ -55,6 +57,8 @@ function App() {
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/subscription" element={<Subscription />} />
       <Route path="/faq" element={<FAQ />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/documentation" element={<Documentation />} />
 
       <Route
         path="/"
