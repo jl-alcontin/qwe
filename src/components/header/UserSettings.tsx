@@ -1,19 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import {
-  Settings,
-  Moon,
-  Sun,
-  Lock,
-  Trash2,
-  Leaf,
-  Sparkles,
-} from "lucide-react";
+import { Settings, Moon, Sun, Lock, Trash2, Leaf, Sparkles } from 'lucide-react';
 import {
   useUpdatePasswordMutation,
   useDeleteAccountMutation,
   useUpdateThemeMutation,
+  useGetUserThemeQuery,
 } from "../../store/services/userService";
 import { useTheme } from "../../utils/theme";
 import { useDispatch } from "react-redux";
@@ -32,8 +25,8 @@ const UserSettings = () => {
   const [updatePassword] = useUpdatePasswordMutation();
   const [updateTheme] = useUpdateThemeMutation();
   const [deleteAccount] = useDeleteAccountMutation();
+  const { data: userTheme, isLoading: isThemeLoading } = useGetUserThemeQuery();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [isThemeLoading, setIsThemeLoading] = useState(false); // Added loading state
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -65,15 +58,12 @@ const UserSettings = () => {
   const handleThemeChange = async (
     newTheme: "light" | "dark" | "green" | "indigo"
   ) => {
-    setIsThemeLoading(true); // Added loading state
     try {
       await updateTheme({ themePreference: newTheme }).unwrap();
       setTheme(newTheme);
       toast.success("Theme updated successfully");
     } catch (error) {
       toast.error("Failed to update theme");
-    } finally {
-      setIsThemeLoading(false); // Added loading state
     }
   };
 
@@ -87,6 +77,12 @@ const UserSettings = () => {
       toast.error("Failed to delete account");
     }
   };
+
+  useEffect(() => {
+    if (!isThemeLoading && userTheme) {
+      setTheme(userTheme.themePreference);
+    }
+  }, [isThemeLoading, userTheme, setTheme]);
 
   return (
     <div className="space-y-8">
@@ -236,3 +232,4 @@ const UserSettings = () => {
 };
 
 export default UserSettings;
+

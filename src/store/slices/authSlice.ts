@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { api } from "../api";
 import { Staff } from "../services/staffService";
+import { useThemeStore } from "../ui/themeStore";
 
 interface User {
   _id: string;
@@ -47,7 +48,7 @@ const authSlice = createSlice({
         _id: string;
         name: string;
         email: string;
-        themePreference?: string;
+        themePreference?: "light" | "dark" | "green" | "indigo";
       }>
     ) => {
       localStorage.clear();
@@ -57,6 +58,12 @@ const authSlice = createSlice({
       state.staff = null;
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
+
+      // Apply theme
+      if (user.themePreference) {
+        const setTheme = useThemeStore.getState().setTheme;
+        setTheme(user.themePreference);
+      }
     },
     setStaffCredentials: (
       state,
@@ -82,6 +89,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { setCredentials, setStaffCredentials, logout } =
-  authSlice.actions;
+export const { setCredentials, setStaffCredentials, logout } = authSlice.actions;
 export default authSlice.reducer;
+

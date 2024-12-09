@@ -82,6 +82,20 @@ router.put("/theme", protect, async (req, res) => {
   }
 });
 
+// Add this new route
+router.get("/theme", protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (user) {
+      res.json({ themePreference: user.themePreference });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
 // Update password
 router.put("/password", protect, async (req, res) => {
   try {
@@ -114,3 +128,4 @@ router.delete("/account", protect, async (req, res) => {
 });
 
 export default router;
+

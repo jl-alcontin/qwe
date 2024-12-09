@@ -43,6 +43,12 @@ export const userApi = api.injectEndpoints({
         method: "DELETE",
       }),
     }),
+    getUserTheme: builder.query<{ themePreference: string }, void>({
+      query: () => ({
+        url: "users/theme",
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -51,4 +57,6 @@ export const {
   useUpdatePasswordMutation,
   useUpdateThemeMutation,
   useDeleteAccountMutation,
+  useGetUserThemeQuery,
 } = userApi;
+
