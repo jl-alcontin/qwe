@@ -1,87 +1,90 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  Store, 
-  ShoppingCart, 
-  BarChart2, 
-  Users, 
-  Package, 
-  Bell, 
-  Shield, 
-  Clock, 
+import React from "react";
+import { Link } from "react-router-dom";
+import {
+  Store,
+  ShoppingCart,
+  BarChart2,
+  Users,
+  Package,
+  Bell,
+  Shield,
+  Clock,
   Smartphone,
   Cloud,
   Settings,
-  CreditCard
-} from 'lucide-react';
-import Hero from '../components/landing/Hero';
-import FeatureCard from '../components/landing/FeatureCard';
-import PricingSection from '../components/landing/PricingSection';
-import TestimonialSection from '../components/landing/TestemonialSection';
-import Footer from '../components/landing/Footer';
+  CreditCard,
+} from "lucide-react";
+import Hero from "../components/landing/Hero";
+import FeatureCard from "../components/landing/FeatureCard";
+import PricingSection from "../components/landing/PricingSection";
+import TestimonialSection from "../components/landing/TestemonialSection";
+import Footer from "../components/landing/Footer";
 
 const LandingPage = () => {
   const features = [
     {
       icon: Store,
-      title: 'Multi-Store Management',
-      description: 'Manage multiple stores from a single dashboard with ease'
+      title: "Multi-Store Management",
+      description: "Manage multiple stores from a single dashboard with ease",
     },
     {
       icon: ShoppingCart,
-      title: 'Smart POS',
-      description: 'Fast and intuitive point of sale with support for multiple payment methods'
+      title: "Smart POS",
+      description:
+        "Fast and intuitive point of sale with support for multiple payment methods",
     },
     {
       icon: Package,
-      title: 'Inventory Management',
-      description: 'Real-time inventory tracking with automatic alerts and reordering'
+      title: "Inventory Management",
+      description:
+        "Real-time inventory tracking with automatic alerts and reordering",
     },
     {
       icon: BarChart2,
-      title: 'Advanced Analytics',
-      description: 'Detailed reports and insights to grow your business'
+      title: "Advanced Analytics",
+      description: "Detailed reports and insights to grow your business",
     },
     {
       icon: Users,
-      title: 'Staff Management',
-      description: 'Manage staff roles, permissions, and track performance'
+      title: "Staff Management",
+      description: "Manage staff roles, permissions, and track performance",
     },
     {
       icon: Bell,
-      title: 'Smart Notifications',
-      description: 'Stay updated with real-time alerts and notifications'
+      title: "Smart Notifications",
+      description: "Stay updated with real-time alerts and notifications",
     },
     {
       icon: Shield,
-      title: 'Secure System',
-      description: 'Enterprise-grade security to protect your business data'
+      title: "Secure System",
+      description: "Enterprise-grade security to protect your business data",
     },
     {
       icon: Clock,
-      title: '24/7 Support',
-      description: 'Round-the-clock customer support for your business needs'
+      title: "24/7 Support",
+      description: "Round-the-clock customer support for your business needs",
     },
     {
       icon: Smartphone,
-      title: 'Mobile Ready',
-      description: 'Access your POS system from any device, anywhere'
+      title: "Mobile Ready",
+      description: "Access your POS system from any device, anywhere",
     },
     {
       icon: Cloud,
-      title: 'Cloud-Based',
-      description: 'No installation required, always up-to-date'
+      title: "Cloud-Based",
+      description: "No installation required, always up-to-date",
     },
     {
       icon: CreditCard,
-      title: 'Multiple Payment Options',
-      description: 'Accept various payment methods including cards, QR, and e-wallets'
+      title: "Multiple Payment Options",
+      description:
+        "Accept various payment methods including cards, QR, and e-wallets",
     },
     {
       icon: Settings,
-      title: 'Customizable',
-      description: 'Tailor the system to your specific business needs'
-    }
+      title: "Customizable",
+      description: "Tailor the system to your specific business needs",
+    },
   ];
 
   return (
@@ -89,10 +92,12 @@ const LandingPage = () => {
       <nav className="bg-white shadow-sm mb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            <div className="flex items-center">
+            <Link to={"/"} className="flex items-center">
               <Store className="h-8 w-8 text-primary" />
-              <span className="ml-2 text-2xl font-bold text-gray-900">IREGO POS</span>
-            </div>
+              <span className="ml-2 text-2xl font-bold text-gray-900">
+                IREGO POS
+              </span>
+            </Link>
             <div className="flex items-center space-x-4">
               <Link to="/login" className="text-gray-600 hover:text-gray-900">
                 Login
@@ -135,9 +140,9 @@ const LandingPage = () => {
       </section>
 
       <PricingSection />
-      
+
       <TestimonialSection />
-      
+
       <Footer />
     </div>
   );

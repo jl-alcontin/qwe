@@ -26,6 +26,7 @@ import UserManagement from "./pages/UserManagement";
 import Unauthorized from "./pages/Unauthorized";
 import Settings from "./pages/Settings";
 import Subscription from "./pages/Subscription";
+import FAQ from "./pages/FAQ";
 import { RootState } from "./store";
 import { PERMISSIONS } from "./utils/permissions";
 import NotFound from "./pages/NotFound";
@@ -53,6 +54,7 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/subscription" element={<Subscription />} />
+      <Route path="/faq" element={<FAQ />} />
 
       <Route
         path="/"
