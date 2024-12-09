@@ -14,6 +14,7 @@ import {
   Settings,
   CreditCard,
 } from "lucide-react";
+import SEO from "../components/SEO";
 import Hero from "../components/landing/Hero";
 import FeatureCard from "../components/landing/FeatureCard";
 import PricingSection from "../components/landing/PricingSection";
@@ -89,6 +90,7 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <SEO />
       <nav className="bg-white shadow-sm mb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
