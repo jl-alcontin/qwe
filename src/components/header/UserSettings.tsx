@@ -22,7 +22,7 @@ interface PasswordForm {
 const UserSettings = () => {
   const { theme, setTheme } = useThemeStore();
   const [updatePassword] = useUpdatePasswordMutation();
-  const [updateTheme] = useUpdateThemeMutation();
+  const [updateTheme, { isLoading: isThemeUpdating }] = useUpdateThemeMutation();
   const [deleteAccount] = useDeleteAccountMutation();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const dispatch = useDispatch();
@@ -93,7 +93,10 @@ const UserSettings = () => {
                   themeOption as "light" | "dark" | "green" | "indigo"
                 )
               }
-              className={`flex items-center gap-2 px-4 py-2 rounded-md ${
+              disabled={isThemeUpdating}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-200 ${
+                isThemeUpdating ? 'opacity-50 cursor-not-allowed' : ''
+              } ${
                 themeOption === "dark"
                   ? theme === themeOption
                     ? "bg-primary text-white"
@@ -107,7 +110,11 @@ const UserSettings = () => {
               {themeOption === "green" && <Leaf className="h-4 w-4" />}
               {themeOption === "indigo" && <Sparkles className="h-4 w-4" />}
               {themeOption === "dark" && <Moon className="h-4 w-4" />}
-              {themeOption.charAt(0).toUpperCase() + themeOption.slice(1)}
+              {isThemeUpdating ? (
+                <span className="inline-block animate-spin">⌛</span>
+              ) : (
+                themeOption.charAt(0).toUpperCase() + themeOption.slice(1)
+              )}
             </button>
           ))}
         </div>
@@ -218,4 +225,3 @@ const UserSettings = () => {
 };
 
 export default UserSettings;
-

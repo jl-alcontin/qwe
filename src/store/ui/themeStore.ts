@@ -9,8 +9,15 @@ interface ThemeStore {
 export const useThemeStore = create<ThemeStore>()(
   persist(
     (set) => ({
-      theme: 'light',
-      setTheme: (theme) => set({ theme }),
+      theme: (typeof window !== 'undefined' && localStorage.getItem('theme-storage')) 
+        ? JSON.parse(localStorage.getItem('theme-storage') || '{}').state?.theme || 'light'
+        : 'light',
+      setTheme: (theme) => {
+        set({ theme });
+        if (typeof window !== 'undefined') {
+          document.documentElement.setAttribute('data-theme', theme);
+        }
+      },
     }),
     {
       name: 'theme-storage',
