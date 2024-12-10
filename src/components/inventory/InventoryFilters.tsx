@@ -1,7 +1,7 @@
 // src/components/inventory/InventoryFilters.tsx
-import React from 'react';
-import { Search } from 'lucide-react';
-import { Category } from '../../store/services/categoryService';
+import React from "react";
+import { Search } from "lucide-react";
+import { Category } from "../../store/services/categoryService";
 
 interface InventoryFiltersProps {
   searchTerm: string;
@@ -22,6 +22,7 @@ const InventoryFilters = ({
   sortBy,
   onSortChange,
 }: InventoryFiltersProps) => {
+
   return (
     <div className="bg-white p-4 rounded-lg shadow mb-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { Package, History, FileDown } from 'lucide-react';
+import { Package, History, FileDown } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useGetProductsQuery } from "../store/services/productService";
 import { useGetStoreQuery } from "../store/services/storeService";
@@ -16,7 +16,7 @@ import Pagination from "../components/inventory/Pagination";
 import StockMovementModal from "../components/inventory/StockMovementModal";
 import StockMovementHistory from "../components/inventory/StockMovementHistory";
 import ProductStockHistoryModal from "../components/inventory/ProductStockHistoryModal";
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -51,7 +51,7 @@ const Inventory = () => {
     // Apply category filter
     if (selectedCategory) {
       filtered = filtered.filter(
-        (product) => product.category === selectedCategory
+        (product) => product.category._id === selectedCategory
       );
     }
 
@@ -71,7 +71,8 @@ const Inventory = () => {
           comparison = a[field] - b[field];
           break;
         case "createdAt":
-          comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+          comparison =
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
           break;
         default:
           comparison = 0;
@@ -99,12 +100,13 @@ const Inventory = () => {
   const handleStockMovement = async (data: any) => {
     try {
       let quantity;
-      if (data.type === 'adjustment') {
+      if (data.type === "adjustment") {
         quantity = Number(data.quantity) - selectedProduct.stock;
       } else {
-        quantity = data.type === 'out' ? -Number(data.quantity) : Number(data.quantity);
+        quantity =
+          data.type === "out" ? -Number(data.quantity) : Number(data.quantity);
       }
-      
+
       await addStockMovement({
         product: selectedProduct._id,
         type: data.type,
@@ -112,7 +114,7 @@ const Inventory = () => {
         reason: data.reason,
         store: storeId,
       }).unwrap();
-      
+
       toast.success("Stock movement recorded successfully");
       setShowMovementModal(false);
       setSelectedProduct(null);
@@ -123,17 +125,20 @@ const Inventory = () => {
 
   const handleExportToExcel = () => {
     const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.json_to_sheet(stockMovements.map(movement => ({
-      Date: new Date(movement.createdAt).toLocaleString(),
-      Product: products.find(p => p._id === movement.product)?.name || 'Unknown',
-      Type: movement.type,
-      Quantity: movement.quantity,
-      Reason: movement.reason
-    })));
+    const worksheet = XLSX.utils.json_to_sheet(
+      stockMovements.map((movement) => ({
+        Date: new Date(movement.createdAt).toLocaleString(),
+        Product:
+          products.find((p) => p._id === movement.product)?.name || "Unknown",
+        Type: movement.type,
+        Quantity: movement.quantity,
+        Reason: movement.reason,
+      }))
+    );
 
     XLSX.utils.book_append_sheet(workbook, worksheet, "Stock Movements");
-    
-    const currentDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
+
+    const currentDate = new Date().toISOString().split("T")[0]; // Get current date in YYYY-MM-DD format
     XLSX.writeFile(workbook, `stock_movements_${currentDate}.xlsx`);
   };
 
@@ -220,4 +225,3 @@ const Inventory = () => {
 };
 
 export default Inventory;
-

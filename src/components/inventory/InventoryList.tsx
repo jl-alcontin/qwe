@@ -100,7 +100,7 @@ const InventoryList: React.FC<InventoryListProps> = ({
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {getCategoryName(product.category)}
+                  {getCategoryName(product.category._id)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
