@@ -11,6 +11,7 @@ import {
 } from "../store/services/categoryService";
 import { handleOfflineAction } from "../utils/offlineStorage";
 import { networkStatus } from "../utils/networkStatus";
+import OfflineIndicator from "../components/sales/OfflineIndicator";
 
 interface CategoryForm {
   name: string;
@@ -47,7 +48,11 @@ const Categories = () => {
         };
 
         if (!networkStatus.isNetworkOnline()) {
-          const handled = await handleOfflineAction('category', 'update', updateData);
+          const handled = await handleOfflineAction(
+            "category",
+            "update",
+            updateData
+          );
           if (handled) {
             setIsModalOpen(false);
             reset();
@@ -59,23 +64,20 @@ const Categories = () => {
         await updateCategory(updateData).unwrap();
         toast.success("Category updated successfully");
       } else {
-        if (!networkStatus.isNetworkOnline()) {
-          const handled = await handleOfflineAction('category', 'create', categoryData);
-          if (handled) {
-            setIsModalOpen(false);
-            reset();
-            return;
-          }
-        }
-
         await createCategory(categoryData).unwrap();
-        toast.success("Category created successfully");
+        if (networkStatus.isNetworkOnline()) {
+          toast.success("Category created successfully");
+        } else {
+          toast.success("Category saved offline. Will sync when online.");
+        }
       }
       setIsModalOpen(false);
       reset();
       setEditingCategory(null);
     } catch (error) {
-      toast.error("Operation failed");
+      setIsModalOpen(false);
+      reset();
+      setEditingCategory(null);
     }
   };
 
@@ -83,7 +85,9 @@ const Categories = () => {
     if (window.confirm("Are you sure you want to delete this category?")) {
       try {
         if (!networkStatus.isNetworkOnline()) {
-          const handled = await handleOfflineAction('category', 'delete', { _id: id });
+          const handled = await handleOfflineAction("category", "delete", {
+            _id: id,
+          });
           if (handled) return;
         }
 
@@ -224,6 +228,8 @@ const Categories = () => {
           </div>
         </div>
       )}
+
+      <OfflineIndicator />
     </>
   );
 };
