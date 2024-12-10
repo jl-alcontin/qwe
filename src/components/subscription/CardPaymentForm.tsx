@@ -13,6 +13,7 @@ interface CardFormData {
   expMonth: string;
   expYear: string;
   cvc: string;
+  cardHolder: string;
 }
 
 const CardPaymentForm: React.FC<CardPaymentFormProps> = ({ amount, onSuccess, onError }) => {
@@ -23,23 +24,31 @@ const CardPaymentForm: React.FC<CardPaymentFormProps> = ({ amount, onSuccess, on
     try {
       setIsProcessing(true);
 
+      // Format card details according to PayMongo requirements
+      const cardDetails = {
+        card_number: data.cardNumber.replace(/\s/g, ''),
+        exp_month: parseInt(data.expMonth),
+        exp_year: parseInt(data.expYear),
+        cvc: data.cvc,
+      };
+
       // Create payment method
       const paymentMethod = await createPaymentMethod({
         type: 'card',
-        details: {
-          cardNumber: data.cardNumber.replace(/\s/g, ''),
-          expMonth: parseInt(data.expMonth),
-          expYear: parseInt(data.expYear),
-          cvc: data.cvc,
-        },
+        details: cardDetails,
+        billing: {
+          name: data.cardHolder,
+          email: 'customer@example.com' // You might want to make this dynamic
+        }
       });
 
       // Create payment intent
       const paymentIntent = await createPaymentIntent({
         amount,
-        currency: 'PHP',
         paymentMethodAllowed: ['card'],
+        paymentMethodId: paymentMethod.id,
         description: 'Subscription Payment',
+        currency: 'PHP'
       });
 
       onSuccess(paymentIntent.id);
@@ -53,6 +62,19 @@ const CardPaymentForm: React.FC<CardPaymentFormProps> = ({ amount, onSuccess, on
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
+        <label className="block text-sm font-medium text-gray-700">Card Holder Name</label>
+        <input
+          type="text"
+          {...register('cardHolder', { required: 'Card holder name is required' })}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+          placeholder="John Doe"
+        />
+        {errors.cardHolder && (
+          <p className="mt-1 text-sm text-red-600">{errors.cardHolder.message}</p>
+        )}
+      </div>
+
+      <div>
         <label className="block text-sm font-medium text-gray-700">Card Number</label>
         <input
           type="text"
@@ -64,7 +86,7 @@ const CardPaymentForm: React.FC<CardPaymentFormProps> = ({ amount, onSuccess, on
             }
           })}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-          placeholder="1234 5678 9012 3456"
+          placeholder="4343 4343 4343 4343"
         />
         {errors.cardNumber && (
           <p className="mt-1 text-sm text-red-600">{errors.cardNumber.message}</p>

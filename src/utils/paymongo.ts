@@ -53,13 +53,14 @@ export const getSourceStatus = async (sourceId: string) => {
   }
 };
 
-export const createPaymentMethod = async (data: any) => {
+export const createPaymentMethod = async ({ type, details, billing }: any) => {
   try {
     const response = await paymongoAxios.post('/payment_methods', {
       data: {
         attributes: {
-          type: data.type,
-          details: data.details,
+          type,
+          details,
+          billing
         },
       },
     });
@@ -70,27 +71,43 @@ export const createPaymentMethod = async (data: any) => {
   }
 };
 
-export const createPaymentIntent = async (data: any) => {
+export const createPaymentIntent = async ({ amount, paymentMethodAllowed, paymentMethodId, description, currency = 'PHP' }: any) => {
   try {
+    // Create payment intent
     const response = await paymongoAxios.post('/payment_intents', {
       data: {
         attributes: {
-          amount: Math.round(data.amount * 100),
-          payment_method_allowed: data.paymentMethodAllowed,
+          amount: Math.round(amount * 100),
+          payment_method_allowed: paymentMethodAllowed,
           payment_method_options: {
             card: { request_three_d_secure: 'any' },
           },
-          currency: data.currency,
+          currency,
           description: IS_DEVELOPMENT 
             ? 'Test payment - Development Mode'
-            : data.description,
+            : description,
           statement_descriptor: 'POS System Subscription',
         },
       },
     });
-    return response.data.data;
+
+    const paymentIntent = response.data.data;
+
+    // Attach payment method to payment intent
+    if (paymentMethodId) {
+      await paymongoAxios.post(`/payment_intents/${paymentIntent.id}/attach`, {
+        data: {
+          attributes: {
+            payment_method: paymentMethodId,
+            client_key: PAYMONGO_PUBLIC_KEY,
+          },
+        },
+      });
+    }
+
+    return paymentIntent;
   } catch (error) {
-    console.error('Error creating payment intent:', error);
+    console.error('Error creating/attaching payment intent:', error);
     throw error;
   }
 };
@@ -104,4 +121,3 @@ export const getPaymentIntentStatus = async (paymentIntentId: string) => {
     throw error;
   }
 };
-
