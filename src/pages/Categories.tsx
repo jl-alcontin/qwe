@@ -9,6 +9,8 @@ import {
   useUpdateCategoryMutation,
   useDeleteCategoryMutation,
 } from "../store/services/categoryService";
+import { handleOfflineAction } from "../utils/offlineStorage";
+import { networkStatus } from "../utils/networkStatus";
 
 interface CategoryForm {
   name: string;
@@ -33,15 +35,40 @@ const Categories = () => {
 
   const onSubmit = async (data: CategoryForm) => {
     try {
+      const categoryData = {
+        ...data,
+        store: storeId!,
+      };
+
       if (editingCategory) {
-        await updateCategory({
+        const updateData = {
           _id: editingCategory._id,
-          ...data,
-          store: storeId,
-        }).unwrap();
+          ...categoryData,
+        };
+
+        if (!networkStatus.isNetworkOnline()) {
+          const handled = await handleOfflineAction('category', 'update', updateData);
+          if (handled) {
+            setIsModalOpen(false);
+            reset();
+            setEditingCategory(null);
+            return;
+          }
+        }
+
+        await updateCategory(updateData).unwrap();
         toast.success("Category updated successfully");
       } else {
-        await createCategory({ ...data, store: storeId }).unwrap();
+        if (!networkStatus.isNetworkOnline()) {
+          const handled = await handleOfflineAction('category', 'create', categoryData);
+          if (handled) {
+            setIsModalOpen(false);
+            reset();
+            return;
+          }
+        }
+
+        await createCategory(categoryData).unwrap();
         toast.success("Category created successfully");
       }
       setIsModalOpen(false);
@@ -52,15 +79,14 @@ const Categories = () => {
     }
   };
 
-  const handleEdit = (category: any) => {
-    setEditingCategory(category);
-    reset({ name: category.name, description: category.description });
-    setIsModalOpen(true);
-  };
-
   const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this category?")) {
       try {
+        if (!networkStatus.isNetworkOnline()) {
+          const handled = await handleOfflineAction('category', 'delete', { _id: id });
+          if (handled) return;
+        }
+
         await deleteCategory(id).unwrap();
         toast.success("Category deleted successfully");
       } catch (error) {
@@ -115,7 +141,14 @@ const Categories = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
-                      onClick={() => handleEdit(category)}
+                      onClick={() => {
+                        setEditingCategory(category);
+                        reset({
+                          name: category.name,
+                          description: category.description,
+                        });
+                        setIsModalOpen(true);
+                      }}
                       className="text-gray-500 hover:text-primary-hover mr-4"
                     >
                       <Edit2 className="h-4 w-4" />
@@ -133,6 +166,7 @@ const Categories = () => {
           </table>
         </div>
       </div>
+
       {isModalOpen && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
