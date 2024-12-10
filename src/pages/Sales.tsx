@@ -17,6 +17,9 @@ import Receipt from "../components/sales/Receipt";
 import SalesHistory from "../components/sales/SalesHistory";
 import DiscountModal from "../components/sales/DiscountModal";
 import { CartItem as CartItemType } from "../components/sales/types";
+import { networkStatus } from "../utils/networkStatus";
+import { saveOfflineSale } from "../utils/indexedDB";
+import OfflineIndicator from "../components/sales/OfflineIndicator";
 
 const Sales = () => {
   const { storeId } = useParams<{ storeId: string }>();
@@ -210,15 +213,33 @@ const Sales = () => {
         paymentDetails: details,
       };
 
-      const result = await createSale(saleData).unwrap();
-      setShowPaymentModal(false);
-      setLastSaleData({
-        ...result,
-        paymentMethod: method,
-        paymentDetails: details,
-      });
-      setShowReceipt(true);
-      toast.success("Payment processed successfully");
+      if (networkStatus.isNetworkOnline()) {
+        // Online flow
+        const result = await createSale(saleData).unwrap();
+        setShowPaymentModal(false);
+        setLastSaleData({
+          ...result,
+          paymentMethod: method,
+          paymentDetails: details,
+        });
+        setShowReceipt(true);
+        toast.success("Payment processed successfully");
+      } else {
+        // Offline flow
+        await saveOfflineSale(saleData);
+        setShowPaymentModal(false);
+        setLastSaleData({
+          ...saleData,
+          createdAt: new Date().toISOString(),
+          status: "pending_sync",
+        });
+        setShowReceipt(true);
+        toast.success("Payment saved offline. Will sync when online.");
+      }
+
+      // Reset cart state
+      setCart([]);
+      setOrderDiscount(null);
     } catch (error) {
       toast.error("Failed to process payment");
     }
@@ -398,6 +419,8 @@ const Sales = () => {
           currentTotal={calculateSubtotal()}
         />
       )}
+
+      <OfflineIndicator />
     </div>
   );
 };
