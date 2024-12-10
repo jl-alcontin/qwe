@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { ShoppingCart, History, Tag, Menu, X } from "lucide-react";
 import { toast } from "react-hot-toast";
@@ -20,6 +20,7 @@ import { CartItem as CartItemType } from "../components/sales/types";
 import { networkStatus } from "../utils/networkStatus";
 import { saveOfflineSale } from "../utils/indexedDB";
 import OfflineIndicator from "../components/sales/OfflineIndicator";
+import { syncManager } from "../utils/syncManager";
 
 const Sales = () => {
   const { storeId } = useParams<{ storeId: string }>();
@@ -39,6 +40,13 @@ const Sales = () => {
   const [lastSaleData, setLastSaleData] = useState<any>(null);
   const [orderDiscount, setOrderDiscount] = useState<any>(null);
   const [showCart, setShowCart] = useState(false);
+
+  // Initialize sync when component mounts
+  useEffect(() => {
+    if (networkStatus.isNetworkOnline()) {
+      syncManager.syncOfflineData();
+    }
+  }, []);
 
   const filteredProducts = products?.filter((product: any) => {
     const matchesCategory =
@@ -70,7 +78,6 @@ const Sales = () => {
         },
       ]);
     }
-    // Show cart on mobile when adding items
     setShowCart(true);
   };
 
@@ -226,10 +233,11 @@ const Sales = () => {
         toast.success("Payment processed successfully");
       } else {
         // Offline flow
-        await saveOfflineSale(saleData);
+        const offlineSaleId = await saveOfflineSale(saleData);
         setShowPaymentModal(false);
         setLastSaleData({
           ...saleData,
+          _id: offlineSaleId,
           createdAt: new Date().toISOString(),
           status: "pending_sync",
         });
