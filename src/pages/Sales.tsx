@@ -290,7 +290,7 @@ const Sales = () => {
       {/* Cart Area */}
       <div
         className={`${
-          showCart ? "fixed inset-0 z-40 bg-white" : "hidden"
+          showCart ? "fixed inset-0 z-40 bg-card" : "hidden"
         } lg:relative lg:block lg:w-96 lg:bg-white lg:rounded-lg lg:shadow-lg`}
       >
         <div className="flex items-center justify-between p-4 border-b">

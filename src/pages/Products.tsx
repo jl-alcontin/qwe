@@ -162,7 +162,7 @@ const Products = () => {
     <>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
+          <h1 className="text-2xl font-semibold text-foreground flex items-center gap-2">
             <Package className="h-6 w-6" />
             Products
           </h1>
@@ -179,7 +179,7 @@ const Products = () => {
           {products?.map((product) => (
             <div
               key={product._id}
-              className="bg-white rounded-lg shadow-md overflow-hidden"
+              className="bg-card rounded-lg shadow-md overflow-hidden"
             >
               {product.image && (
                 <img
@@ -189,17 +189,17 @@ const Products = () => {
                 />
               )}
               <div className="p-4">
-                <h3 className="text-lg font-medium text-gray-900">
+                <h3 className="text-lg font-medium text-primary">
                   {product.name}
                 </h3>
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-gray-400">
                   {product.description}
                 </p>
                 <div className="mt-2 flex items-center justify-between">
-                  <span className="text-lg font-bold text-gray-900">
+                  <span className="text-lg font-bold text-primary">
                     ${product.price.toFixed(2)}
                   </span>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-400">
                     Stock: {product.stock}
                   </span>
                 </div>
@@ -210,7 +210,7 @@ const Products = () => {
                       setModifiers(product.modifiers || []);
                       setIsModalOpen(true);
                     }}
-                    className="text-primary hover:text-primary-hover"
+                    className="text-gray-400 hover:text-primary-hover"
                   >
                     <Edit2 className="h-4 w-4" />
                   </button>

@@ -75,7 +75,7 @@ const Categories = () => {
     <>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-semibold text-gray-900">Categories</h1>
+          <h1 className="text-2xl font-semibold text-foreground">Categories</h1>
           <button
             onClick={() => {
               setEditingCategory(null);
@@ -89,25 +89,25 @@ const Categories = () => {
           </button>
         </div>
 
-        <div className="bg-white shadow-md rounded-lg overflow-hidden">
+        <div className="bg-card shadow-md rounded-lg overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-card">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-sm font-medium text-primary uppercase tracking-wider">
                   Name
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-sm font-medium text-primary uppercase tracking-wider">
                   Description
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-sm font-medium text-primary uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-card divide-y divide-gray-200">
               {categories?.map((category) => (
                 <tr key={category._id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-500">
                     {category.name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -116,7 +116,7 @@ const Categories = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
                       onClick={() => handleEdit(category)}
-                      className="text-primary hover:text-primary-hover mr-4"
+                      className="text-gray-500 hover:text-primary-hover mr-4"
                     >
                       <Edit2 className="h-4 w-4" />
                     </button>
