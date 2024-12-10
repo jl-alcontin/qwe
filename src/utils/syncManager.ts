@@ -1,8 +1,27 @@
 import { networkStatus } from './networkStatus';
-import { getUnsynedSales, markSaleAsSynced, deleteOfflineSale } from './indexedDB';
+import {
+  getUnsynedSales,
+  getUnsynedProducts,
+  getUnsynedCategories,
+  getUnsynedInventory,
+  getUnsynedReports,
+  markSaleAsSynced,
+  markProductAsSynced,
+  markCategoryAsSynced,
+  markInventoryAsSynced,
+  markReportAsSynced,
+  deleteOfflineSale,
+  deleteOfflineProduct,
+  deleteOfflineCategory,
+  deleteOfflineInventory,
+  deleteOfflineReport,
+} from './indexedDB';
 import { createNotification } from './notification';
 import { store } from '../store';
 import { saleApi } from '../store/services/saleService';
+import { productApi } from '../store/services/productService';
+import { categoryApi } from '../store/services/categoryService';
+import { inventoryApi } from '../store/services/inventoryService';
 
 class SyncManager {
   private isSyncing: boolean = false;
@@ -22,12 +41,101 @@ class SyncManager {
   }
 
   private startPeriodicSync() {
-    // Check for unsynced data every minute
     this.syncInterval = setInterval(() => {
       if (networkStatus.isNetworkOnline()) {
         this.syncOfflineData();
       }
-    }, 60000);
+    }, 60000); // Check every minute
+  }
+
+  private async syncProducts() {
+    const unsynedProducts = await getUnsynedProducts();
+    for (const product of unsynedProducts) {
+      try {
+        switch (product.action) {
+          case 'create':
+            await store.dispatch(productApi.endpoints.createProduct.initiate(product.data)).unwrap();
+            break;
+          case 'update':
+            await store.dispatch(productApi.endpoints.updateProduct.initiate(product.data)).unwrap();
+            break;
+          case 'delete':
+            await store.dispatch(productApi.endpoints.deleteProduct.initiate(product.data._id)).unwrap();
+            break;
+        }
+        await markProductAsSynced(product.id);
+        await deleteOfflineProduct(product.id);
+      } catch (error) {
+        console.error('Failed to sync product:', error);
+      }
+    }
+  }
+
+  private async syncCategories() {
+    const unsynedCategories = await getUnsynedCategories();
+    for (const category of unsynedCategories) {
+      try {
+        switch (category.action) {
+          case 'create':
+            await store.dispatch(categoryApi.endpoints.createCategory.initiate(category.data)).unwrap();
+            break;
+          case 'update':
+            await store.dispatch(categoryApi.endpoints.updateCategory.initiate(category.data)).unwrap();
+            break;
+          case 'delete':
+            await store.dispatch(categoryApi.endpoints.deleteCategory.initiate(category.data._id)).unwrap();
+            break;
+        }
+        await markCategoryAsSynced(category.id);
+        await deleteOfflineCategory(category.id);
+      } catch (error) {
+        console.error('Failed to sync category:', error);
+      }
+    }
+  }
+
+  private async syncInventory() {
+    const unsynedInventory = await getUnsynedInventory();
+    for (const inventory of unsynedInventory) {
+      try {
+        switch (inventory.action) {
+          case 'create':
+          case 'update':
+            await store.dispatch(inventoryApi.endpoints.addStockMovement.initiate(inventory.data)).unwrap();
+            break;
+        }
+        await markInventoryAsSynced(inventory.id);
+        await deleteOfflineInventory(inventory.id);
+      } catch (error) {
+        console.error('Failed to sync inventory:', error);
+      }
+    }
+  }
+
+  private async syncSales() {
+    const unsynedSales = await getUnsynedSales();
+    for (const sale of unsynedSales) {
+      try {
+        await store.dispatch(saleApi.endpoints.createSale.initiate(sale.data)).unwrap();
+        await markSaleAsSynced(sale.id);
+        await deleteOfflineSale(sale.id);
+      } catch (error) {
+        console.error('Failed to sync sale:', error);
+      }
+    }
+  }
+
+  private async syncReports() {
+    const unsynedReports = await getUnsynedReports();
+    for (const report of unsynedReports) {
+      try {
+        // Store reports locally until online
+        await markReportAsSynced(report.id);
+        await deleteOfflineReport(report.id);
+      } catch (error) {
+        console.error('Failed to sync report:', error);
+      }
+    }
   }
 
   public async syncOfflineData() {
@@ -35,45 +143,29 @@ class SyncManager {
     
     try {
       this.isSyncing = true;
-      const unsynedSales = await getUnsynedSales();
       
-      if (unsynedSales.length === 0) return;
+      // Sync all entity types
+      await Promise.all([
+        this.syncProducts(),
+        this.syncCategories(),
+        this.syncInventory(),
+        this.syncSales(),
+        this.syncReports()
+      ]);
 
-      console.log('Starting sync of offline sales:', unsynedSales.length);
-
-      for (const sale of unsynedSales) {
-        try {
-          console.log('Syncing sale:', sale.id);
-          
-          // Use the RTK Query endpoint to create the sale
-          const result = await store.dispatch(
-            saleApi.endpoints.createSale.initiate(sale.data)
-          ).unwrap();
-
-          console.log('Sale synced successfully:', result);
-
-          await markSaleAsSynced(sale.id);
-          await deleteOfflineSale(sale.id);
-
-          // Create notification for successful sync
-          await createNotification(
-            store.dispatch,
-            `Offline sale successfully synced`,
-            'system',
-            sale.data.store
-          );
-        } catch (error) {
-          console.error('Failed to sync sale:', error);
-          await createNotification(
-            store.dispatch,
-            `Failed to sync offline sale. Will retry later.`,
-            'alert',
-            sale.data.store
-          );
-        }
-      }
+      // Create notification for successful sync
+      await createNotification(
+        store.dispatch,
+        'All offline data has been synchronized successfully',
+        'system'
+      );
     } catch (error) {
       console.error('Error during sync process:', error);
+      await createNotification(
+        store.dispatch,
+        'Some data failed to sync. Will retry later.',
+        'alert'
+      );
     } finally {
       this.isSyncing = false;
     }
