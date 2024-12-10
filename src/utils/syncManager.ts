@@ -69,6 +69,7 @@ class SyncManager {
         console.error('Failed to sync product:', error);
       }
     }
+    return unsynedProducts.length;
   }
 
   private async syncCategories() {
@@ -92,6 +93,7 @@ class SyncManager {
         console.error('Failed to sync category:', error);
       }
     }
+    return unsynedCategories.length;
   }
 
   private async syncInventory() {
@@ -110,6 +112,7 @@ class SyncManager {
         console.error('Failed to sync inventory:', error);
       }
     }
+    return unsynedInventory.length;
   }
 
   private async syncSales() {
@@ -123,6 +126,7 @@ class SyncManager {
         console.error('Failed to sync sale:', error);
       }
     }
+    return unsynedSales.length;
   }
 
   private async syncReports() {
@@ -136,6 +140,7 @@ class SyncManager {
         console.error('Failed to sync report:', error);
       }
     }
+    return unsynedReports.length;
   }
 
   public async syncOfflineData() {
@@ -144,8 +149,14 @@ class SyncManager {
     try {
       this.isSyncing = true;
       
-      // Sync all entity types
-      await Promise.all([
+      // Sync all entity types and get counts
+      const [
+        productsCount,
+        categoriesCount,
+        inventoryCount,
+        salesCount,
+        reportsCount
+      ] = await Promise.all([
         this.syncProducts(),
         this.syncCategories(),
         this.syncInventory(),
@@ -153,12 +164,16 @@ class SyncManager {
         this.syncReports()
       ]);
 
-      // Create notification for successful sync
-      await createNotification(
-        store.dispatch,
-        'All offline data has been synchronized successfully',
-        'system'
-      );
+      const totalSynced = productsCount + categoriesCount + inventoryCount + salesCount + reportsCount;
+
+      // Only create notification if there was data to sync
+      if (totalSynced > 0) {
+        await createNotification(
+          store.dispatch,
+          `Successfully synchronized ${totalSynced} offline items`,
+          'system'
+        );
+      }
     } catch (error) {
       console.error('Error during sync process:', error);
       await createNotification(
